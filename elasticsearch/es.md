@@ -41,7 +41,9 @@
 # 快速入门 
 
 - 启动elasticsearch：elaticsearch.bat
+  - localhost:9200/?pretty
 - 启动kibana：kibana.bat
+  - localhost:5601
 - ![](images/QQ截图20190218101315.png)
 - document数据格式
   - 用json数据格式来表达
@@ -410,6 +412,7 @@
       }
     }
   }
+  ```
 
 
   //
