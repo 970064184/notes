@@ -42,12 +42,20 @@
 
 - 启动elasticsearch：elaticsearch.bat
   - localhost:9200/?pretty
+
 - 启动kibana：kibana.bat
+
+  - 可视化工具
+
+
   - localhost:5601
+
 - ![](images/QQ截图20190218101315.png)
+
 - document数据格式
   - 用json数据格式来表达
   - es面向文档的，文档中存储的数据结构，与面向对象的数据结构是一样的，基于这种文档数据结构，es可以提供复杂的索引，全文检索，分析聚合等功能
+
 - 简单是集群管理
   - 快速检查集群的健康情况
     - GET /_cat/health?v
