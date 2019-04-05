@@ -814,8 +814,37 @@
       - 竞争激烈时能维持常态，比lock性能好；缺点：只能同步一个值
       - AtomicXXX：CAS、unsafe、compareAndSwapInt
 
+#### Atomic原子类 
 
- ![](images/QQ截图20181209181555.png)
+##### 基本类型 
+
+- AtomicInteger：整型原子类
+  - 线程安全原理：主要利用CAS（compare and swap）+volatile和native方法来保证原子操作，从而避免synchronized的高开销，执行效率大为提升
+  - （CAS的原理是拿期望的值和原本的一个值作比较，如果相同则更新成新的值。unsafe类的objectFiledOffet()方法是一个本地方法，这个方法是拿到“原来的值”的内存地址，返回值是valueOffset。另外value是一个volatile变量，在内存中可见，因此jvm可保证任何时刻任何线程总能拿到该变量的最新值）
+- AtomicLong：长整型原子类
+- AtomicBoolean：布尔型原子类
+
+##### 数组类型
+
+- AtomicIntegerArray：整型数组原子类
+- AtomicLongArray：长整型组原子类
+- AtomicReferenceArray：引用类型数组原子类
+
+##### 引用类型
+
+- AtomicReference：引用类型原子类
+- AtomicStampedRerference：原子更新引用类型里的字段原子类
+- AtomicMarkableRerference：原子更新带有标记位的引用类型
+
+##### 对象的属性修改类型
+
+- AtomicIntegerFieldUpdater：原子更新整型字段的更新器
+- AtomicLongFieldUpdater：原子更新长整型字段的更新器
+- AtomicStampedeReference：原子更新带有版本号的引用类型（可用于解决原子的更新数据和数据的版本号，可以解决使用CAS进行原子更新时可能出现的ABA问题）
+
+
+
+#### ![](images/QQ截图20181209181555.png)
 
 
 ```java
@@ -1058,8 +1087,9 @@ package com.zhangbin.cloud.controller.test.thread;
       - volatile 、synchronized、 lock
       - happens -before原则：8个
 
-
 ### 同步方法 
+
+#### synchronized与reentrantLock 
 
 - 原子性--》锁
 
@@ -1077,6 +1107,8 @@ package com.zhangbin.cloud.controller.test.thread;
 
 - 同步块
 
+  - synchronized同步块的实现原理：使用的是monitorenter和monitorexit指令，其中monitorenter指令指向同步代码块的开始位置，monitorexit指令指明同步代码块的结束位置
+
   - ```java
     synchronized(引用类型|this(对象本身)|类.class){
       
@@ -1085,6 +1117,8 @@ package com.zhangbin.cloud.controller.test.thread;
 
 
   - 同步方法
+
+    - synchronized修饰方法的实现原理：是ACC_SYNCHRONIZED标识，该标识指明了该方法是一个同步方法，jvm通过该ACC_SYNCHRONIZED访问标志来辨别一个方法是否声明为同步方法，从而执行相应的同步调用
 
     - ```java
       package com.zhangbin.cloud.controller.test.thread;
@@ -1240,11 +1274,15 @@ package com.zhangbin.cloud.controller.test.thread;
 
   - 使用重入锁实现线程同步lock锁
 
+    - （可重入锁：自己可再次获取自己的内部锁。比如一个线程获得了某个对象的锁，此时这个对象锁还没有释放，当其再次想要获取这个对象的锁的时候还是可以获取的，如果不可锁重入的话，就会造成死锁。同一个线程每次获取锁，锁的计数器都自增1，所以要等到锁的计数器下降为0时才能释放锁）
+
     - Lock和synchronized的区别
 
       - Lock是显式锁（手动开启和关闭锁，别忘记关闭锁），synchronized是隐式锁
       - Lock只有代码块锁，synchronized有代码块锁和方法锁
       - 使用lock锁，jvm将花费较少的时间来调度线程，性能更好。并且具有更好的扩展性
+      - synchronized依赖于jvm实现的，reenTrantLock 依赖于jdk
+      - reentrantLock增加了一些高级功能，等待可中断（正在等待的线程可以选择放弃等待，改为处理其它事情）；可实现公平锁（所谓的公平锁就是先等待的线程先获得锁），而synchronized只能是非公平锁；可实现选择性通知（线程对象可以注册在指定的condition中，从而可以有选择性的进行线程通知，在调度线程上更加灵活。在使用notify/notifyAll()方法进行通知时，被通知的线程是由jvm选择的，用reentrantLock类结合condition实例可实现“选择性通知”）
 
     - 优先使用顺序：
 
@@ -1252,12 +1290,12 @@ package com.zhangbin.cloud.controller.test.thread;
 
     - ```java
       package com.zhangbin.cloud.controller.test.thread;
-
+      
       import java.util.concurrent.locks.Lock;
       import java.util.concurrent.locks.ReentrantLock;
-
+      
       public class TestVolatile {
-
+      
       	public static void main(String[] args) {
       		VolatileThread volatileThread = new VolatileThread(20);
       		Thread t1 = new Thread(volatileThread, "黄牛1");
@@ -1269,9 +1307,9 @@ package com.zhangbin.cloud.controller.test.thread;
       		t3.start();
       		t4.start();
       	}
-
+      
       }
-
+      
       class VolatileThread implements Runnable{
       	
       	private int num;
@@ -1283,11 +1321,11 @@ package com.zhangbin.cloud.controller.test.thread;
       	
       	public VolatileThread() {
       	}
-
+      
       	public VolatileThread(int num) {
       		this.num = num;
       	}
-
+      
       	@Override
       	public  void run() { //线程体
       		while(flag) {
@@ -1879,7 +1917,7 @@ public class ConcurrencyTest {
 
 ## 线程组与线程池 
 
-### 线程池 
+### 线程池
 
 > 问题：创建和销毁对象是非常耗费时间的
 >
@@ -1962,6 +2000,168 @@ public class ConcurrencyTest {
   - ![](images/2.png)
   - ![](images/3.png)
   - ![](images/4.png)
+
+#### 线程池作用 
+
+- 限制系统中执行线程的数量（因为创建和销毁对象是非常销毁时间的）
+  - 根据系统的环境情况，可以自动或手动设置线程数量，达到运行的最佳效果；少了浪费了系统资源，多了会造成系统拥挤效率不高，用线程池控制线程数量，其他线程排队等候。一个任务执行完毕，再从队列的中取最前面的任务开始执行。若队列中没有等到进程，线程池的这一资源处于等待。当一个新任务需要运行时，如果线程池中有等待的工作线程，就可以开始运行了，否则进入等待队列。
+
+#### 四种线程池newCachedThreadPool、newFixedThreadPool、newScheduledThreadPool、newSingleThreadExecutor 
+
+- https://www.cnblogs.com/baizhanshi/p/5469948.html
+
+##### newCachedThreadPool 
+
+- 创建一个可缓存线程池，如果线程池长度超过处理需要，可灵活回收空闲线程，若无可回收，则新建线程
+
+- ```java
+  public class TestNewCachedThreadPool {
+  	
+  	static int tickets =10;
+  	
+  	public static void main(String[] args) {
+  		ExecutorService newCachedThreadPool = Executors.newCachedThreadPool();
+  		while (tickets>0) {
+  			try {
+  				Thread.sleep(1000);
+  			} catch (InterruptedException e) {
+  				e.printStackTrace();
+  			}
+  			newCachedThreadPool.execute(()->{
+  				if(tickets>0)
+  				System.out.println(Thread.currentThread().getName()+"卖出了第"+tickets--+"张票");
+  			});
+  		}
+  	}
+  }
+  
+  pool-1-thread-1卖出了第10张票
+  pool-1-thread-1卖出了第9张票
+  pool-1-thread-1卖出了第8张票
+  pool-1-thread-1卖出了第7张票
+  pool-1-thread-1卖出了第6张票
+  pool-1-thread-1卖出了第5张票
+  pool-1-thread-1卖出了第4张票
+  pool-1-thread-1卖出了第3张票
+  pool-1-thread-1卖出了第2张票
+  pool-1-thread-1卖出了第1张票
+  
+  ```
+
+- （线程池为无限大，当执行第二个任务时第一个任务已经完成，会复用执行第一个任务的线程，而不用每次新建线程）
+
+##### newFixedThreadPool 
+
+- 创建一个定长线程池，可控制线程最大并发数，超出的线程会在队列中等待
+
+- ```java
+  public class TestNewCachedThreadPool {
+  	
+  	static int tickets =10;
+  	
+  	public static void main(String[] args) {
+  		ExecutorService newCachedThreadPool = Executors.newFixedThreadPool(3);
+  		while (tickets>0) {
+  			try {
+  				Thread.sleep(1000);
+  			} catch (InterruptedException e) {
+  				e.printStackTrace();
+  			}
+  			newCachedThreadPool.execute(()->{
+  				if(tickets>0)
+  				System.out.println(Thread.currentThread().getName()+"卖出了第"+tickets--+"张票");
+  			});
+  		}
+  	}
+  }
+  
+  pool-1-thread-1卖出了第10张票
+  pool-1-thread-2卖出了第9张票
+  pool-1-thread-3卖出了第8张票
+  pool-1-thread-1卖出了第7张票
+  pool-1-thread-2卖出了第6张票
+  pool-1-thread-3卖出了第5张票
+  pool-1-thread-1卖出了第4张票
+  pool-1-thread-2卖出了第3张票
+  pool-1-thread-3卖出了第2张票
+  pool-1-thread-1卖出了第1张票
+  
+  ```
+
+- （定长线程池的大小）
+
+##### newScheduledThreadPool 
+
+- 创建一个定长线程池，支持定时及周期性任务执行
+
+- ```java
+  public class TestNewScheduledThreadPool {
+  	
+  	public static void main(String[] args) {
+  		ScheduledExecutorService newScheduledThreadPool = Executors.newScheduledThreadPool(3);
+  		newScheduledThreadPool.schedule(()->{
+  			System.out.println("delay 3 seconds");
+  		}, 3, TimeUnit.SECONDS);
+  	}
+  }
+  ```
+
+- （延迟3秒执行）
+
+- ```java
+  public static void main(String[] args) {
+  		ScheduledExecutorService newScheduledThreadPool = Executors.newScheduledThreadPool(3);
+  		/*newScheduledThreadPool.schedule(()->{
+  			System.out.println("delay 3 seconds");
+  		}, 3, TimeUnit.SECONDS);*/
+  		
+  		newScheduledThreadPool.scheduleAtFixedRate(new Runnable() {
+  			  
+  			@Override
+  			public void run() {
+  			System.out.println("delay 1 seconds, and excute every 3 seconds");
+  			}
+  			}, 1, 3, TimeUnit.SECONDS);
+  	}
+  
+  delay 1 seconds, and excute every 3 seconds
+  delay 1 seconds, and excute every 3 seconds
+  ```
+
+- 
+
+##### newSingleThreadExecutor 
+
+- 创建一个单线程化的线程池，它只会用唯一的工作线程来执行任务，保证所有任务按照指定顺序（FIFO、LIFO、优先级）执行（如果这个唯一的线程因为异常结束，那么会有一个新的线程来替代它，因此线程池保证所有任务的执行顺序按照任务的提交顺序执行）
+
+- ```java
+  public class TestNewSingleThreadExecutor {
+  	
+  	static  int tickets = 10;
+  	
+  	public static void main(String[] args) {
+  		ExecutorService newSingleThreadExecutor = Executors.newSingleThreadExecutor();
+  		while(tickets >0) {
+  			try {
+  				Thread.sleep(1000);
+  			} catch (InterruptedException e) {
+  				e.printStackTrace();
+  			}
+  			newSingleThreadExecutor.execute(()->{
+  				if(tickets>0) {
+  					System.out.println(Thread.currentThread().getName()+"卖出了第"+tickets--+"张票");
+  				}
+  			});
+  		}
+  	}
+  }
+  ```
+
+- （依次输出，相当于顺序执行各个任务）
+
+- - 
+
+
 
 ## 线程总结 
 
@@ -2404,8 +2604,22 @@ https://blog.csdn.net/sheji105/article/details/82657708
 #### 乐观锁与悲观锁 
 
 - 乐观锁
-  - 
+  - （总是假设最好的情况，每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据，可以使用版本号机制和CAS算法实现。）**乐观锁适用于多读的应用类型，这样可提高吞吐量，**像数据库提供的类似于write_condition机制；在java中java.util.concurrent.atomic包下面的原子变量类使用了乐观锁的一种实现方式CAS实现的
+  - 乐观锁常见的两种实现方式
+    - 版本号机制
+    - CAS算法
+      - （compare and swap（比较与交换），是一种有名的无锁算法）
+      - （无锁编程，即不使用锁的情况下实现多线程之间的变量同步，也就是在没有线程被阻塞的情况下实现变量的同步，也叫非阻塞同步）CAS算法涉及到三个操作数：
+        - 需要读写的内存值V
+        - 进行比较的值A
+        - 拟写入的新值B
+        - （当且仅当V的值等于A时，CAS通过原子方式用新值B来更新V值，否则不会执行任何操作（比较和替换是一个原子操作）一般情况下是一个自旋操作，即不断的重试）
+  - 乐观锁缺点
+    - ABA问题
+    - 循环时间长开销大
+    - 只能保证一个共享变量的原子操作
 - 悲观锁
+  - （总是假设最坏的情况，每次去拿数据的时候都认为别人会修改，所以每次在拿数据的时候都会上锁，这样别人想拿这个数据就会阻塞直到它拿到锁（共享资源每次只给一个线程使用，其它线程阻塞，用完后再把资源转让给其它线程））：数据库：行锁、表锁、读锁、写锁；java中的synchronize和reentrantLock等独占锁就是悲观锁思想的实现
 
 #### 共享锁（读锁）与排它锁（写锁） 
 
@@ -2486,11 +2700,45 @@ https://juejin.im/post/5aa3c7736fb9a028bb189bca
 
 ### 分布式架构中间件
 
+
+
+- 常用组件
+  - 分布式存储
+  - 分布式锁
+  - 分布式日志
+  - 消息队列
+  - 分布式文件存储
+  - 断路器
+  - 分布式数据库
+  - CDN、ADN
+  - 集中式配置
+  - 反向代理
+
 ## IO与NIO 
 
-| IO     | NIO      |
-| ------ | -------- |
-| 面向流 | 面向缓冲 |
-| 阻塞IO | 非阻塞IO |
-| 无     | 选择器   |
+### 同步与异步 
 
+- 同步：同步就是发起一个调用后，被调用者未处理完请求之前，调用不返回
+- 异步：异步就是发起一个调用后，立刻得到被调用者的回应表示已接收到请求，但是被调用者并没有返回结果，此时我们可以处理其它请求，被调用者通常依靠事件，回调等机制来通知调用者其返回结果。
+- (同步和异常的区别最大在于异步的话调用者不需要等待处理结果，被调用者会通过回调等机制来通知调用者其返回结果)
+
+### 阻塞与非阻塞
+
+- 阻塞：阻塞就是发起一个请求，调用者一直等待请求结果返回，也就是当前线程会被挂起，无法从事其他任务，只有当条件就绪才能继续。
+- 非阻塞：非阻塞就是发起一个请求，调用者不用一直等着结果返回，可以先去干其他事情
+
+| IO （同步非阻塞）          | NIO                                          |
+| -------------------------- | -------------------------------------------- |
+| 面向流（流的读写是单向的） | 面向缓冲（buffer）（NIO通过channel通道读写） |
+| 阻塞IO                     | 非阻塞IO                                     |
+| 无                         | 选择器                                       |
+
+### NIO核心组件 
+
+- channel（通道）
+- buffer（缓冲区）
+- selector（选择器）
+
+![](images/Slector.png)
+
+- AIO -->NIO2（异步非阻塞的IO模型）
