@@ -137,6 +137,10 @@ BASE：
 
 # Redis
 
+## 为什么redis是单线程的 
+
+- 因为redis是基于内存的操作，CPU不是redis的瓶颈，redis的瓶颈最有可能是机器内存的大小或者网络带宽。既然单线程容易实现，而且CPU不会成为瓶颈，那就顺理成章的采用单线程的方案
+
 - redis：是一个基于内存的高性能key-value数据库
 
   （整个数据库加载在内存当中进行操作，定期通过异步操作把数据库数据flush到硬盘上保存。因为是纯内存操作，redis性能非常出色，每秒可以处理超过10万次读写操作）
@@ -456,7 +460,7 @@ OK
 
 #### Set 命令
 
-将一个或多个member元素加入到集合key当中，已经存在于集合的member元素将被忽略：sadd key member
+将一个或多个member元素加入到集合key当中，已经存在于集合的member元素将被忽略：sadd key member（自动排重）
 
 返回集合key中的所有成员：SMEMBERS key
 
@@ -1329,7 +1333,7 @@ http://blog.51cto.com/13961945/2174326（面试题）
       - 成本较低，非阻塞，性能较高
       - watch指令（事务）
     - 针对客户端，操作前可加锁
-      - synchronized或lock等方式
+      - （应用程序处理资源的同步）synchronized或lock等方式
 
 
 
@@ -1355,3 +1359,33 @@ http://blog.51cto.com/13961945/2174326（面试题）
   - 惰性
     - key过期的时候不删除，每次从数据库获取key的时候去检查是否过期，若过期，则删除，返回null
   - 定期
+
+## redis的应用场景 
+
+https://blog.csdn.net/qq_34337272/article/details/80012284
+
+- 计数：微博数、粉丝数等
+  - String：decr、incr
+- 商品的波段性的热点高频信息
+  - 如，七夕过节热搜词
+
+- 会话缓存
+- 消息队列
+  - 排行榜：list：lpush、rpush
+- 发布、订阅消息（消息通知）
+- 商品列表、评论列表
+  - hash：hset、hget：存储对象
+- 共同关注、共同喜欢
+  - set：sadd（自动排重）
+- 在直播系统中，实时排行信息包含直播间在线用户列表，各种礼物排行榜，弹幕消息（可以理解为按消息纬度的消息排行榜）
+  - zset：zadd
+
+## redis 性能测试 
+
+- 自带相关测试工具
+
+  - redis -benchmark --help
+
+  - redis -benchmard -n 1000000 -q
+
+    (同时执行100万的请求)
