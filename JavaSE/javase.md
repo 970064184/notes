@@ -2745,3 +2745,14 @@ https://juejin.im/post/5aa3c7736fb9a028bb189bca
 ![](images/Slector.png)
 
 - AIO -->NIO2（异步非阻塞的IO模型）
+
+# JVM 
+
+## JAM组成部分 
+
+- 类加载器
+- 运行时数据区
+- 执行引擎
+- 本地库接口
+- （程序在执行之前先要把java代码转换成字节码（class文件），jvm首先需要把字节码通过一定的方式**类加载器（classLoader）**把文件加载到内存中**运行时数据区（Runtime Data Area）**，而字节码文件是jvm的一套指令集规范，并不能直接交个底层操作系统去执行，而这个过程中需要调用其它语言的接口**本地库接口（native interface）**来实现整个程序的功能）
+
