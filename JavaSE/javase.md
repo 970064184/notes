@@ -2748,7 +2748,7 @@ https://juejin.im/post/5aa3c7736fb9a028bb189bca
 
 # JVM 
 
-## JAM组成部分 
+## JVM组成部分 
 
 - 类加载器
 - 运行时数据区
