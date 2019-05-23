@@ -1,6 +1,6 @@
 ![](images/20181122164025106.png)
 
-
+https://blog.csdn.net/weixin_40834464/article/details/88850523
 
 # spring-boot-actuator 
 

@@ -267,3 +267,28 @@
 
 
 
+# inner join 、left join、right join 
+
+https://blog.csdn.net/w348399060/article/details/70158125
+
+- inner join（内连接，或等值连接）：显式
+  - select * from a inner join b on a.id = b.id
+  - ![](images/o_sql1.png)
+  - 隐式：select a.* ,b.* from a ,b where a.id = b.id 
+  - （用时差不多）
+- left join（左连接）
+  - select * from a left join b on a.id = b.id
+  - ![](images/o_sql3.png)
+  - （左连接从左表a产生一套完整的记录，与匹配的记录右表b。如果匹配不到，右侧将包含null）
+- right join（右连接）
+  - select * from b right join a where a.id = b.id
+  - ![](images/o_sql3.png)
+  - 
+
+## 总结 
+
+- 尽量用inner join，里面left join 和null
+- 尽量避免子查询，而用join
+- where和on的区别
+  - on是两者join形成新表时用到的匹配条件
+  - where是对已经搜索出的结果的过滤条件
