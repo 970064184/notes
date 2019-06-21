@@ -35,7 +35,7 @@
 
     ![](images/QQ截图20181116093932.png)
 
-    ​
+    
 
   - 特别注意：
 
@@ -82,13 +82,13 @@
 
     chmod 755 post-commit
 
-    ​
+    
 
     ![](images/QQ截图20181116100020.png)
 
     ![](images/QQ截图20181116101015.png)
 
-    ​
+    
 
 ##  jenkins + Github 
 
@@ -111,6 +111,8 @@ centos 6.5 或更高的版本，要求系统为64位、
 
 系统内核版本为2.6.32-431或者更高版本
 
+-> 20190617亲测：centos6.10不行，换成centos7就可以了
+
 ```java
 #可通过底下命令查到系统的版本信息
 uname -r
@@ -121,13 +123,22 @@ cat /ect/redhat-release
   yum install -y epel-release
   yum install -y docker-io
   安装后的配置文件：/etc/sysconfig/docker
+  //vim  /lib/systemd/system/docker.service  
   启动docker后台服务：service docker start
   docker version验证
+  //安装教程：https://help.aliyun.com/document_detail/60742.html?spm=a2c4g.11186623.6.548.5ebc5787F2Exja
+  //https://cr.console.aliyun.com/cn-shanghai/instances/mirrors
+  //docker info ：检查加速器是否生效
   ```
 
 - vim /etc/sysconfig/docker
 
+  - 970064184qq-->jun
+  - 阿里云官方文档：https://help.aliyun.com/document_detail/60742.html?spm=a2c4g.11186623.6.548.709a1e66cXJgsY
+
   - ![](images/QQ截图20181130161652.png) 
+
+实战：https://blog.csdn.net/tangtong1/article/details/53556129
 
 ## docker组成 
 
@@ -191,3 +202,26 @@ cat /ect/redhat-release
     - docker rmi -f  镜像名1:TAG 镜像名2:TAG 
   - 删除全部
     - docker rmi -f $(docker images -qa)
+
+### 容器命令 
+
+- docker ps：查看已启动的容器
+- docker ps -a：查看所有容器
+- docker start 容器ID：启动一个已存在的容器
+- docker attach 容器ID：进入容器
+- docker stop 容器ID：停止容器
+- docker rm 容器ID：删除容器，容器必须是停止状态的才可以删除，否则-f
+
+- docker run --privileged=true -it centos:6 #--privileged是以获取系统权限的形式运行， -it是互动模式，跟本地的系统进行交互,调用的本地的终端
+- 
+- docker commit d83c4279f146 centos:6 #d83c4279f146是CONTAINER ID，centos:6是IMAGE，容器名
+  - 保存在容器中做过的修改
+- docker export 容器ID：导出容器
+
+# 镜像 
+
+- 从仓库获取镜像
+- 管理本地主机上的镜像
+- 镜像实现的基本原理
+
+# 容器
