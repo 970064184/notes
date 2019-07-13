@@ -43,6 +43,20 @@
 
   - 
 
+- 权限相关
+
+  - ```
+    //查看mysql数据库中所有用户
+    SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user;
+    //查看数据库中具体某个用户的权限
+    show grants for 'wang'@'localhost';
+    //赋予权限
+    GRANT USAGE ON *.* TO 'cuz'@'localhost' IDENTIFIED BY PASSWORD '*4585fa1158f37e2c1d7e41e4e309714a3fdd7826';
+    GRANT ALL PRIVILEGES ON `cuz`.* TO 'cuz'@'localhost';
+    //刷新生效
+    flush privileges 
+    ```
+
 # 遇到的坑 
 
 - mysql连接报错：Mysql:Host is not allowed to connect to this MySQL server

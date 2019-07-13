@@ -96,6 +96,8 @@
 
 # Docker
 
+https://my.oschina.net/jamesview/blog/2994112
+
 解决了运行环境和配置问题软件容器，方便做持续集成并有助于整体发布的容器虚拟化技术。
 
 - 更快速的应用支付和部署
@@ -206,17 +208,47 @@ cat /ect/redhat-release
 ### 容器命令 
 
 - docker ps：查看已启动的容器
+
 - docker ps -a：查看所有容器
+
 - docker start 容器ID：启动一个已存在的容器
+
 - docker attach 容器ID：进入容器
+
 - docker stop 容器ID：停止容器
+
 - docker rm 容器ID：删除容器，容器必须是停止状态的才可以删除，否则-f
 
 - docker run --privileged=true -it centos:6 #--privileged是以获取系统权限的形式运行， -it是互动模式，跟本地的系统进行交互,调用的本地的终端
-- 
+
+  - -d：后台运行
+
+- docker logs:查看容器日志
+
+  - docker logs -f -t --tail 100 容器名：查看某容器最后100行日志
+
+  - > 例：查看指定时间后的日志，只显示最后100行：
+    >  docker logs -f -t --since="2018-02-08" --tail=100 user-uat
+    >  例：查看最近30分钟的日志:
+    >  docker logs --since 30m user-uat
+    >  例：查看某时间之后的日志：
+    >  docker logs -t --since="2018-02-08T13:23:37"  user-uat
+    >  例：查看某时间段日志：
+    >  docker logs -t --since="2018-02-08T13:23:37" --until "2018-02-09T12:23:37"  user-uat
+    >  例：将错误日志写入文件：
+    >  docker logs -f -t --since="2018-02-18" user-uat | grep error >> logs_error.txt
+
 - docker commit d83c4279f146 centos:6 #d83c4279f146是CONTAINER ID，centos:6是IMAGE，容器名
+
   - 保存在容器中做过的修改
+
 - docker export 容器ID：导出容器
+
+- docker import容器ID：导入容器
+
+- docker container prune：清理所有处于终止状态的容器
+
+- docker exec -it 容器ID /bin/bash：进入容器
 
 # 镜像 
 
@@ -225,3 +257,110 @@ cat /ect/redhat-release
 - 镜像实现的基本原理
 
 # 容器
+
+
+
+# Dockerfile 
+
+- FROM：指定基础镜像
+- ADD：将会自动解压缩这个压缩文件到<目标路径>去
+- RUN：用来执行命令行命令的
+- COPY：将从构建上下文目录中<源路径>的文件/目录复制到新的一层的镜像内的<目标路径>位置
+  - COPY <源路径>  <目标路径>
+  - COPY["<源路径>",..."<目标路径>"]
+- CMD：启动命令
+  - shell格式：CMD<命令>
+  - exec格式：CMD["可执行文件","参数1","参数2"...]
+- docker-compose ：自动构建镜像并使用镜像启动容器
+  - docker-compose up -d：后台启动并运行容器
+  - ps：列出所有运行容器
+  - logs：查看服务日志输出
+  - port：打印绑定的公共端口
+  - build：构建或者重新构建服务
+  - start：启动指定服务已存在的容器
+  - stop：停止已运行的服务的容器
+  - rm：删除指定服务的容器
+  - kill：通过发送sigkill信号来停止指定服务的容器
+  - pull：下载服务镜像
+  - scale：设置指定服务运行容器的个数
+  - run：在一个服务上执行一个命令
+
+# compose 
+
+> Dockerfile模板文件：定义一个单独的应用容器
+>
+> compose：（多个容器相互配合来完成某项任务的情况）
+
+- compose中有两个重要概念：
+  - 服务（services）：一个应用的容器，实际上可包括若干运行相同镜像的容器实例
+  - 项目（probject）：由一组关联的应用容器组成的一个完整业务单元，在docker-compose.yml文件中定义
+  - （一个项目可由多个服务（容器）关联而成，compose面向项目进行管理）
+
+# 数据卷 volume 
+
+- docker volume ls：查看vlume
+- docker volume prune：删除未被使用的数据卷
+  - https://www.linuxidc.com/Linux/2018-10/154633.htm
+
+# 坑
+
+## docker no space left on device 问题解决办法
+
+https://blog.csdn.net/QQ401476683/article/details/82848757
+
+- docker system df：查看docker现在硬盘状态
+- docker system prune：删除所有停止的容器
+  - docker system prune -a：将没有容器使用docker镜像都删掉
+
+## 修改已经创建的docker容器端口映射 
+
+https://www.one234.com/share/973/update-docker-container-port-map/
+
+> **0）  docker container list –all**
+>
+> 结果中的CONTAINER ID列为容器id
+>
+> **1）  docker inspect <容器id>   |  grep Id**
+>
+> 查看容器hash，<容器id>由步骤0）获得
+>
+> **2）  docker stop <容器id>**
+>
+> 停止运行中的容器
+>
+> **3） vim /var/lib/docker/containers/[容器hash]/hostconfig.json**
+>
+> 编辑容器配置文件，<容器hash>由步骤1）获得
+>
+> 修改PortBindings参数配置，宿主机8001端口映射容器80端口示例：
+>
+> “PortBindings”:{“80/tcp”:[{“HostIp”:””,”HostPort”:”8001″}]},”
+>
+> **4) systemctl restart docker**
+>
+> 重新启动docker引擎
+>
+> **5）docker start <容器id>**
+>
+> 重新启动docker容器
+
+# docker jira+ mysql 
+
+https://hub.docker.com/r/blacklabelops/jira
+
+- mysql -uroot -p ：进入mysql
+
+- show variables like "charac%"：查看系统参数
+
+- set names utf8
+
+  - > ```mysql
+    > 执行SET NAMES utf8的效果等同于同时设定如下：
+    > SET character_set_client='utf8';
+    > SET character_set_connection='utf8';
+    > SET character_set_results='utf8';
+    > ```
+
+# K8S
+
+- 编排、管理、调度
