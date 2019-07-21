@@ -309,8 +309,16 @@ cat /ect/redhat-release
 https://blog.csdn.net/QQ401476683/article/details/82848757
 
 - docker system df：查看docker现在硬盘状态
+
 - docker system prune：删除所有停止的容器
+
   - docker system prune -a：将没有容器使用docker镜像都删掉
+
+- [只删除未使用的](https://docs.docker.com/engine/reference/commandline/volume_prune/)volume:
+
+  ```js
+  docker volume prune
+  ```
 
 ## 修改已经创建的docker容器端口映射 
 
@@ -389,13 +397,27 @@ https://hub.docker.com/r/blacklabelops/jira
 > WHERE TABLE_SCHEMA = 'confluencedb'
 >
 > ```
->  docker run -d --name mysql \
+> docker run -d --name mysql \
+>  --network confluencenet \
+>  -e 'MYSQL_ROOT_PASSWORD=verybigsecretrootpassword' \
+>  -e 'MYSQL_DATABASE=confluencedb' \
+>  -e 'MYSQL_USER=confluencedb' \
+>  -e 'MYSQL_PASSWORD=jellyfish' \
+>  mysql:5.6
+>  
+>  docker run -v /data/your-confluence-home:/var/atlassian/application-data/confluence --name="confluence" --network confluencenet -d -p 8090:8090 -p 8091:8091  --link mysql   atlassian/confluence-server
+>  
+>  
+>  docker run -d --name jira \
 >     --network confluencenet \
->     -e 'MYSQL_ROOT_PASSWORD=verybigsecretrootpassword' \
->     -e 'MYSQL_DATABASE=confluencedb' \
->     -e 'MYSQL_USER=confluencedb' \
->     -e 'MYSQL_PASSWORD=jellyfish' \
->     mysql:5.6
+>     -v jiravolume:/var/atlassian/jira \
+>       -e "JIRA_DATABASE_URL=postgresql://jiradb@postgres/jiradb" \
+>       -e "JIRA_DB_PASSWORD=jellyfish" \
+>       -p 8081:8080 blacklabelops/jira
+>       
+> docker run -d --name jira \
+>       --network confluencenet \
+>       -p 8081:8090 blacklabelops/jira     
 > ```
 >
 > ```
@@ -409,3 +431,7 @@ https://hub.docker.com/r/blacklabelops/jira
 # K8S
 
 - 
+
+```
+$> 
+```
