@@ -344,6 +344,17 @@ https://www.one234.com/share/973/update-docker-container-port-map/
 >
 > 重新启动docker容器
 
+## Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?`
+
+解决办法
+`$ systemctl daemon-reload`
+
+`$ sudo service docker restart`
+
+`$ sudo service docker status (should see active (running))`
+
+`$ sudo docker run hello-world`
+
 # docker jira+ mysql 
 
 https://hub.docker.com/r/blacklabelops/jira
@@ -361,6 +372,40 @@ https://hub.docker.com/r/blacklabelops/jira
     > SET character_set_results='utf8';
     > ```
 
+- .查看MYSQL数据库服务器和数据库字符集
+
+  ```
+  方法一：show variables like '%character%';
+  方法二：show variables like 'collation%';
+  ```
+
+> - 编排、管理、调度
+>
+> 1. grant all on confluencedb. *to 'confluencedb'@'%' identified by 'jellyfish' with grant option;*
+> 2. 
+>
+> SELECT CONCAT('ALTER TABLE ', table_name, ' CONVERT TO CHARACTER SET   utf8 COLLATE utf8_bin;')
+> FROM information_schema.TABLES
+> WHERE TABLE_SCHEMA = 'confluencedb'
+>
+> ```
+>  docker run -d --name mysql \
+>     --network confluencenet \
+>     -e 'MYSQL_ROOT_PASSWORD=verybigsecretrootpassword' \
+>     -e 'MYSQL_DATABASE=confluencedb' \
+>     -e 'MYSQL_USER=confluencedb' \
+>     -e 'MYSQL_PASSWORD=jellyfish' \
+>     mysql:5.6
+> ```
+>
+> ```
+> alter database confluencedb default character set utf8  COLLATE utf8_bin;
+> ```
+>
+> ```
+> apt-get update && apt-get install lrzsz
+> ```
+
 # K8S
 
-- 编排、管理、调度
+- 

@@ -57,6 +57,25 @@
     flush privileges 
     ```
 
+- 查看事务隔离级别
+
+  - ```mysql
+    SHOW VARIABLES LIKE 'tx_isolation';
+    ```
+
+- 查看全局的事务隔离级别
+
+  - ```mysql
+    SHOW GLOBAL VARIABLES LIKE 'tx_isolation';
+    ```
+
+- 设置事务隔离级别
+
+  - ```mysql
+    SET GLOBAL tx_isolation='REPEATABLE-READ';
+    SET SESSION tx_isolation='SERIALIZABLE';
+    ```
+
 # 遇到的坑 
 
 - mysql连接报错：Mysql:Host is not allowed to connect to this MySQL server
