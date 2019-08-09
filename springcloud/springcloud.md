@@ -80,7 +80,55 @@ https://juejin.im/post/5b83466b6fb9a019b421cecc
   - Eureka Server：注册中心，里面有一个注册表，保存了各个服务所在的机器和端口号
   - Eureka Client：负责将这个服务的信息注册到Eureka Server中
 
+## Eureka 的自我保护模式 
 
+> ```java
+> //Eureka 自我保护模式，即如果真实服务已经down掉，但在注册中心界面服务却一直存在，且显示为UP状态
+> EMERGENCY! EUREKA MAY BE INCORRECTLY CLAIMING INSTANCES ARE 
+>  UP WHEN THEY'RE NOT. RENEWALS ARE LESSER THAN THRESHOLD AND 
+>  HENCE THE INSTANCES ARE NOT BEING EXPIRED JUST TO BE SAFE.
+> ```
+
+- 产生原因
+  - Eureka server在运行期间，会统计心跳失败的比例在15分钟之内是否低于85%，如果出现低于的情（在单机调试时很容易满足，实际在生成环境上通常是由于网络不稳定导致），Eureka server会将当前的实例注册信息保护起来，同时提示这个警告。保护模式主要用于一组客户端和Eureka server之间存在网络分区场景下的保护。一旦进入保护模式，Eureka Server将会尝试保护其服务注册表中的信息，不再删除服务注册表中的数据（也就是不会注销任何微服务）
+
+- 解决这种情况的解决方式
+
+  - 等待Eureka Server自动恢复
+
+    - 正常的情况下，等待网络恢复（或者没有频繁的启动与关闭实例）后，等待一段时间Eureka Server会自动关闭自我保护模式，但是如果它迟迟没有关闭该模式，那么便可以尝试手动关闭，例如：重启Eureka Server
+
+  - 重启Eureka Server
+
+    - 通常，PRD环境建议对Eureka Server做负载均衡，这样在依次关闭并开启Eureka Server后，无效的实例会被清除，并且不会对正常的使用造成影响
+
+  - 关闭Eureka的自我保护模式
+
+    - 在Eureka Server yml配置文件中新增如下配置：
+
+      ```yml
+      eureka:
+        server:
+          enable-self-preservation: false #禁用自我保护模式
+          eviction-interval-timer-in-ms: 4000 # This is not required
+      ```
+
+    - >  Eureka Client端：配置开启健康检查，并按需要配置续约更新时间和到期时间
+      >
+      > ```yml
+      > eureka.client.healthcheck.enabled # 开启健康检查（需要spring-boot-starter-actuator依赖）true 
+      > eureka.instance.lease-renewal-interval-in-seconds # 续约更新时间间隔（默认30秒） 10
+      > eureka.instance.lease-expiration-duration-in-seconds # 续约到期时间（默认90秒） 30
+      > #更改Eureka更新频率将打破服务器的自我保护功能，生产环境下不建议自定义这些配置。 
+      > ```
+
+- 开发环境的Eureka Server
+
+  - 对于开发环境的Eureka Server，个人更建议关闭它的自我保护模式，因为它可能需要不断的开启与关闭实例，如果并未关闭自我保护模式，那么很容易就会触发自我保护模式，此时对调试会相对比较麻烦
+
+    但是关闭自我保护模式，会有另外一个可能的问题，即隔一段时间后，可能会发生实例并未关闭，却无法通过网关访问了，此时很可能是由于网络问题，导致实例（或网关）与Eureka Server断开了连接，Eureka Server已经将其注销（网络恢复后，实例并不会再次注册），此时重启Eureka Server节点或实例，并等待一小段时间即可。
+
+    综上，自我保护模式是一种应对网络异常的安全保护措施，它的架构哲学是宁可同时保留所有微服务（健康的微服务和不健康的微服务都会保留），也不盲目注销任何健康的微服务。使用自我保护模式。使用自我保护模式，可以让Eureka集群更加的健壮、稳定。
 
 # 引出RestTemplate和Ribbon
 

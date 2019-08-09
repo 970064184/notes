@@ -2821,7 +2821,7 @@ https://juejin.im/post/5aa3c7736fb9a028bb189bca
     - 本地方法栈：与栈类似，不过则为虚拟机使用到的native方法服务。
 - 执行引擎
 - 本地库接口
-- （程序在执行之前先要把java代码转换成字节码（class文件），jvm首先需要把字节码通过一定的方式**类加载器（classLoader）**把文件加载到内存中**运行时数据区（Runtime Data Area）**，而字节码文件是jvm的一套指令集规范，并不能直接交个底层操作系统去执行，而这个过程中需要调用其它语言的接口**本地库接口（native interface）**来实现整个程序的功能）
+- 组件的作用：（程序在执行之前先要把java代码转换成字节码（class文件），jvm首先需要把字节码通过一定的方式**类加载器（classLoader）**把文件加载到内存中**运行时数据区（Runtime Data Area）**，而字节码文件是jvm的一套指令集规范，并不能直接交给底层操作系统去执行，因此需要特定的命令解析器**执行引擎**，将字节码翻译成底层系统指令，再交由CPU去执行，而这个过程中需要调用其它语言的接口**本地库接口（native interface）**来实现整个程序的功能）
 
 ## jvm编译过程
 
@@ -2863,7 +2863,7 @@ https://juejin.im/post/5b45ef49f265da0f5140489c#heading-4
 
 - 启动类加载器（bootstrap classloader）
 
-  - 加载java home中lib目录下的类
+  - 加载java home中lib目录下的类，或者被-Xbootclasspath参数所指定的路径中并且被虚拟机识别的类库
 
 - 扩展类加载器（extclassloader）
 
