@@ -1,8 +1,25 @@
 # 坑 
 
 - save时数据库默认值不生效
+  
+- ```jav
+    //方法一
+    @DynamicUpdate
+    @DynamicInsert
+    
+    
+    @Column(name="auth_type",columnDefinition = "Integer default 2")
+    private Integer authType;
+    ```
+  
+  - ```java
+    //方法二
+    @Column(name="p_id",insertable = false,updatable = false)
+    private Long pId;
+    ```
+  
   - 
-
+  
 - 分页查询
 
   - ```java

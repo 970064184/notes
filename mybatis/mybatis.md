@@ -34,5 +34,32 @@
   Student selectById(integer id);
   ```
 
-- ​
+
+## 分页查询 
+
+```java
+   /**
+     * 分页查询
+     * @param lastname
+     * @param pageable
+     * @return
+     */
+    @Query(value = "SELECT * FROM tb_shop_brand b WHERE isdeleted = 0 and audit_status=?1  ORDER BY update_time desc nulls last,audit_time desc NULLS LAST",
+            countQuery = "SELECT count(*) FROM  tb_shop_brand b WHERE isdeleted = 0 and audit_status=?1", nativeQuery = true)
+    Page<TbShopBrand> findByPage(int auditStatus,Pageable pageable);
+```
+
+
+
+# mybatis-plus 
+
+- > 特性：
+  >
+  > - 支持lambda
+  > - 支持注解自动生成：支持多达4种主键策略（内含分布式唯一ID生成器-Sequence）
+  > - 内置代码生成器：采用代码或maven插件可快速生成Mapper、Model、service、controller层代码，支持模板引擎，更有超多自定义配置
+  > - 内置分页插件：写分页等同于普通List查询
+  > - 分页插件支持多种数据库：支持mysql、oracle等
+  > - 内置性能分析插件：可输出SQL语句及其执行时间，建议开发测试时启用该功能，能快速揪出慢查询
+  > - 内置全局拦截插件：提供全部delete、update操作智能分析阻断，也可自定义拦截规则，预防误操作
 
