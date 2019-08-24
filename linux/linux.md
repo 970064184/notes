@@ -33,6 +33,8 @@
 
 # 相关命令 
 
+https://blog.csdn.net/zhangliao613/article/details/79021606
+
 ## 系统 
 
 - 关机与重启
@@ -111,6 +113,23 @@
   - vim /etc/sysconfig/iptables
     - ![](images/QQ截图20181123144820.png)
     - 重启防火墙：service iptables restart
+
+- 查看CPU
+
+  https://blog.csdn.net/zhangliao613/article/details/79021606
+
+  - 查看CPU个数：cat /proc/cpuinfo|grep "physical id"|uniq|wc -l
+  - 查看CPU核数：cat /proc/cpuinfo|grep "cpu cores"|uniq
+  - 查看CPU型号：cat /proc/cpuinfo|grep "model name"|uniq
+
+- 查看内存总数
+
+  - cat /proc/meminfo |grep MemTotal
+  - free -m :查看内存使用量和交换区使用量
+  - uptime：查看系统运行时间、用户数、负载
+  - fdisk -l：查看所有分区
+  - last：查看用户登录日志
+  - dmidecode |grep -A16 "Memory Device$"：查看内存条数
 
 ## vi/vim 
 
@@ -545,6 +564,8 @@
   - netstat -anp：查看所有的网络服务
   - netstat -anp |grep sshd：查看了sshd服务的网络服务情况
   - netstat -tunlp：查看端口占用情况
+  - netstat -lntp：查看所有监听端口
+  - netstat -antp：查看所有已经建立的连接
 
 
   - -an：按一定顺序排序输出

@@ -91,3 +91,22 @@ https://blog.csdn.net/tonghui_tonghui/article/details/76696260
 - 优化group by
 
 - 
+
+# 锁表
+
+```java
+select session_id from v$locked_object;
+SELECT sid, serial#, username, osuser FROM v$session where sid =3768;
+SELECT SID FROM V$MYSTAT WHERE ROWNUM =1;
+
+SELECT object_name, machine, s.sid, s.serial# 
+FROM gv$locked_object l, dba_objects o, gv$session s 
+WHERE l.object_id　= o.object_id 
+AND l.session_id = s.sid; 
+
+--alter system kill session 'sid, serial#'; 
+ALTER system kill session '3768, 10751'; 
+
+
+```
+

@@ -2,7 +2,7 @@
 
 - save时数据库默认值不生效
   
-- ```jav
+- ```java
     //方法一
     @DynamicUpdate
     @DynamicInsert

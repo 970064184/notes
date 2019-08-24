@@ -2575,7 +2575,7 @@ https://blog.csdn.net/sheji105/article/details/82657708
 
 - 更新数据时会锁住整张表
 
-###### serializable可串行化 
+###### serializable可串行化 (序列化)
 
 强制的进行排序，在每个读数据行上添加共享锁。会导致大量超时现象和锁竞争
 
@@ -2873,7 +2873,7 @@ https://juejin.im/post/5b45ef49f265da0f5140489c#heading-4
 
   - 加载classpath指定目录下的类
 
-- 工作过程：
+- 工作过程：（双亲委派机制）
 
   - 当AppClassLoader加载一个class时，它首先不会自己去尝试加载这个类，而是把类加载请求委派给父类加载器ExtClassLoader去完成
   - 当ExtClassLoader加载一个class时，它首先也不会自己去尝试加载这个类，而是把类加载请求委派给BootstrapClassLoader去完成。
@@ -2941,6 +2941,8 @@ https://juejin.im/post/5b45ef49f265da0f5140489c#heading-4
 ### jmap堆内存统计工具 
 
 - jmap命令用来查看堆内存使用状况，一般结合jhat使用，用于生产heap dump文件。jmap不仅能生产dump文件，还可以查询finalize执行队列，java堆和元空间metaspace的详细信息，如当前使用率、当前使用的是哪种收集器等等
+
+  - > 堆转储（heap dump）是一个用来检查java内存中的对象和数据的内存文件。该文件可以通过执行JDK的jmap命令来创建。在创建文件的过程中，所有java程序将暂停，因此，不要在系统执行过程中创建该文件。
 
 ### jhat 堆快照分析工具 
 
