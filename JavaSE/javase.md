@@ -2952,6 +2952,15 @@ https://juejin.im/post/5b45ef49f265da0f5140489c#heading-4
 
 - jstack用于生产java虚拟机当前时刻的线程快照。线程快照是当前java虚拟机内每一条线程正在执行的方法堆栈的集合。生成线程快照的主要目的是定位线程出现长时间停顿的原因，如线程间死锁、死循环、请求外部资源导致的长时间等待等待。
 - 线程出现停顿的时候，通过jstack来查看各个线程的调用堆栈，就可以知道没有响应的线程到底在后台做什么事情，或者等待什么资源。如果java程序崩溃生成core文件，jstack工具可通过core文件获取java stack和native stack 的信息，从而定位程序崩溃的原因。
+- jstack 输出文件里，值得关注的线程状态（java.lang.Thread.State）有：
+  - 死锁，Deadlock（重点关注）
+  - 执行中，Runnable
+  - 等待资源，Waiting on condition（重点关注）
+  - 等待获取监视器，waiting on monitor entry（重点关注）
+  - 暂停，Suspended
+  - 对象等待中，Object.wait()或TIMED_WAITING
+  - 阻塞，Blocked（重点关注，只有synchronized这种方式的锁（monitor锁）才会让线程出现BLOCKED状态，等待ReentrantLock则不会）
+  - 停止，Parked（LockSupport两组方法park/pardNanos/parkUntil，使用带参数Object blocker的，jstack输出中会显示更详细的线程信息）
 
 ## 调优工具 
 
