@@ -1,14 +1,28 @@
 ![](images/16a53b474aaceee0.png)
 
 - spring framework
+
   - 包括了IOC依赖注入，Context上下文，bean管理，springmvc等众多功能模块，其它spring项目比如spring boot也会依赖spring框架。
+
+  - > spring 有哪些不同的功能？
+    >
+    > - 容器：spring负责创建和管理对象（Bean）的生命周期和配置
+    > - IOC：控制反转
+    > - AOP：面向切面编程可以将应用业务逻辑和系统服务分离，以实现高内聚
+    > - MVC：对web应用提供了高度可配置性，其它框架的集成十分方便
+    > - 事务管理：提供了用于事务管理的通用抽象层。
+    > - JDBC异常：spring 的JDBC抽象层提供了一个异常层次结构，简化了错误处理策略
 - spring boot
+
   - 它的目标是简化spring应用和服务的创建，开发与部署，简化了配置文件，使用嵌入式web服务器，含有诸多开箱即用的微服务功能，可以和spring cloud联合部署
 - spring data
+
   - 是一个数据访问及操作的工具集，封装了多种数据源的操作能力，包括jdbc、redis、mongodb等
 - spring cloud
+
   - 分布式系统的开发，集成了服务发现，配置管理，消息总线，负载均衡，断路器，数据监控等各种服务治理能力。
 - spring security
+
   - 主要用于快速构建安全的应用程序和服务，在springboot和spring security oauth2的基础上，可快速实现常见安全模型，如单点登录、令牌中继和令牌交换。
 
 ![](images/16a53b47514646f0.png)
@@ -20,6 +34,13 @@
 > 假设公司有产品、研发、测试等岗位。如果是公司根据岗位要求，逐个安排人选，这就是正向流程。如果反过来，不用公司来安排候选人，而是由第三方猎头来匹配岗位和候选人，然后推荐，这就是控制反转。
 >
 > 在spring中，对象的属性是由对象自己创建的，就是正向流程；如果属性不是对象创建，而是由spring来自动进行装配，就是控制反转。这里的DI也就是依赖注入，就是实现控制反转的方式。
+
+- Spring框架的核心是Spring容器。容器创建对象，将它们装配在一起，配置它们并管理它们的完整生命周期。
+- spring中有多少种IOC容器？（区别？）
+  - BeanFactory：就像一个包含bean集合的工厂类。它会在客户端要求时实例化bean。
+  - ApplicationContext：此接口扩展了BeanFactory接口。它在Beanfactory基础上提供了一些额外的功能。
+- Spring IOC的实现机制：
+  - Spring 中的IOC的实现原理：工厂模式+反射机制
 
 # context上下文和bean 
 
