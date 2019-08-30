@@ -38,28 +38,122 @@
 - Spring框架的核心是Spring容器。容器创建对象，将它们装配在一起，配置它们并管理它们的完整生命周期。
 - spring中有多少种IOC容器？（区别？）
   - BeanFactory：就像一个包含bean集合的工厂类。它会在客户端要求时实例化bean。
+  
   - ApplicationContext：此接口扩展了BeanFactory接口。它在Beanfactory基础上提供了一些额外的功能。
+  
+  - （spring创建并完成依赖注入后，所有的bean统一放在一个叫做context上下文中进行管理
+  
+  - > - AppicationContext保存了IOC的整个应用上下文，可以通过其中的beanfactory获取到任意的bean；
+    > - BeanFactory主要的作用是根据bean definition来创建具体的bean
+    > - BeanWrapper是对bean的包装，一般情况下是在spring IOC内部使用，提供了访问bean的属性值、属性编辑器注册、类型转换等功能，方便IOC容器用统一的方式来访问bean的属性
+    > - FactoryBean通过getObject方法返回实际的bean对象
+  
+    ）
 - Spring IOC的实现机制：
+  
   - Spring 中的IOC的实现原理：工厂模式+反射机制
 
-# context上下文和bean 
+## IOC容器启动流程
 
-- 由spring创建的、用于依赖注入的对象，叫做一个bean
+> 使用Spring时，xml和注解是使用得最多的两种配置方式，虽然是两种完全不同的配置方式，但对于IOC容器来说，两种方式的不同主要是在BeanDefinition的解析上。而对于核心的容器启动流程，仍然是一致的。
 
-- spring创建并完成依赖注入后，所有的bean统一放在一个叫做context上下文中进行管理
+- AbstractApplicationContext的refresh方法实现了IOC容器启动的主要逻辑，启动流程中的关键步骤在源码中也可以对应到独立的方法。接下来以AbstractApplicationContext的实现类ClassPathXmlApplicationContext为主，并对比其另一个实现类AnnotationConfigApplicationContext，解读IOC容器的启动过程。
 
-- > - AppicationContext保存了IOC的整个应用上下文，可以通过其中的beanfactory获取到任意的bean；
-  > - BeanFactory主要的作用是根据bean definition来创建具体的bean
-  > - BeanWrapper是对bean的包装，一般情况下是在spring IOC内部使用，提供了访问bean的属性值、属性编辑器注册、类型转换等功能，方便IOC容器用统一的方式来访问bean的属性
-  > - FactoryBean通过getObject方法返回实际的bean对象
-  >
-  > 
+  - ClassPathXmlApplicationContext和AnnotationConfigApplication都继承自AbstractApplicationContext
+
+  ![](images/16cdbb814fba923b.png)
+
+  - ApplicationContext接口，实现类AbstractApplicationContext
+    - 无论哪种context，创建后都会调用到AbstractApplicationContext类的refresh方法。
+    - ![](images/16a53b4778e4a18f.png)
+      1. 对刷新进行准备，包括设置时间，设置激活状态、初始化context环境中的占位符，这个动作根据子类的需求由子类来执行，然后验证是否缺失必要的properties
+      2. 刷新并获得内部的bean factory
+      3. 对bean factory进行准备工作，比如设置类加载器和后置处理器、配置不进行自动配置的类型，注册默认的环境bean
+      4. 为context的子类提供后置处理的bean factory的扩展能力。如果子类想在bean定义加载完成后，开始初始化上下文之前做一些特殊逻辑，可以重写这个方法
+      5. 执行context中注册的bean factory后缀处理器
+      6. 按优先级顺序在beanfactory中注册bean的后缀处理器，bean后置处理器可以在bean初始化前，后执行处理
+      7. 初始化消息源，消息源用来支持消息的国际化
+      8. 初始化应用事件广播器。事件广播器用来向applicationListener通知各种应用产生的事件，是一个标准的观察者模式
+      9. 是留给子类的扩展步骤，用来让特定的context子类初始化其他的bean
+      10. 把实现了ApplicationListener的bean注册到事件广播器，并对广播器中的早期未广播事件进行通知
+      11. 冻结所有bean描述信息的修改，实例化非延迟加载的单例bean
+      12. 完成上下文的刷新工作，调用LifecycleProcessor的onFresh()方法以及发布ContextRefreshedEvent事件
+      13. 在finally中，执行第十三步，重置公共的缓存，比如ReflectionUtils中的缓存、AnnotationUtils中缓存等
+
+# Beans（context上下文和bean）
+
+-  什么是spring bean？
+
+  - Bean由Spring IOC容器管理
+  - 它们由Spring IOC容器实例化、配置、装配和管理
+  - Bean是基于用户提供给容器的配置元数据创建
+  - 是构成用户应用程序主干的对象
+
+- spring 提供了哪些配置方式？
+
+  - 基于xml配置
+
+    - ```xml
+      <bean id="studentbean" class="org.edureka.firstSpring.StudentBean">  <property name="name" value="Edureka"></property>  </bean>  
+      ```
+
+  - 基于注解配置
+
+    - 默认情况下，Spring容器中未打开注解装配。启用：
+
+      ```xml
+      <beans>  <context:annotation-config/> 
+      ```
+
+      - 相关注解：@Component、@Controller、@Service、@Repository
+
+  - 基于java API配置
+
+    - Spring的java配置是通过使用@Bean和@Configuration来实现
+
+- Spring支持集中bean scope？
+
+  - Singleton：每个spring IOC容器仅有一个单实例
+  - Prototype：每次请求都会产生一个新的实例
+  - Request：每次HTTP请求都会产生一个新的实例，并且该bean仅在当前HTTP请求内有效
+  - Session：每次HTTP请求都会产生一个新的bean，同时该bean仅在当前HTTP session内有效
+  - Global-session：被限定于全局portletSession的生命周期范围内。
+  - （仅当用户使用支持Web的ApplicationContext时，最后三个才可用）
+
+- Spring bean容器的生命周期：？
+  - Spring容器根据配置中的bean定义中实例化bean
+  - SPring使用依赖注入填充所有属性，如bean中所定义的配置
+  - 如果bean实现BeanNameAware接口，则工厂通过传递bean的ID来调用setBeanName()
+  - 如果bean实现BeanFactoryAware接口，工厂通过传递自身的实例来调用setBeanFactory
+  - 如果存在于bean关联的任何BeanPOSTProcessors，则调用preProcessBeforeInitialzation()方法
+  - 如果为bean指定了init方法（<bean>的init-method属性，那么将调用它
+  - 最后，如果存在于bean关联的任何BeanPOSTProcessors，则将调用postProcessAfterInitialization()方法
+  - 如果bean实现DisposableBean接口，当spring容器关闭时，会调用destroy()
+  - 如果为bean指定了destory方法（<bean>的destroy-method属性，那么将调用它
+
+- ？什么是Spring装配 ？
+- 自动装配有哪些方式？
+  - no
+    - 默认设置，表示没有自动装配。应使用显示bean引用进行装配
+  - byName
+    - 根据bean名称注入对象依赖项。
+  - byType
+    - 根据类型注入对象依赖项。
+  - 构造函数
+    - 通过调用类的构造函数来注入依赖项
+  - autodetect
+    - 首先容器尝试通过构造函数使用autowire装配，如果不能，则尝试通过byType自动装配
 
 # AOP （面向切面编程）
+
+- AOP的基本单元是Aspect（切面）
 
 - AOP以功能进行划分，对服务顺序执行流程中的不同位置进行横切，完成各服务共同需要实现的功能。
 - AOP 的实现是通过代理模式，在调用对象的某个方法时，执行插入的切面逻辑。实现的方式有动态代理也叫运行时增强，比如jdk代理，CGLIB；静态代理是在编译时进行织入或类加载时进行织入。
 - （关于AOP还需了解对应的Aspect、pointcut、advice等注解和具体使用方式）
+- Spring AOP 和AspectJ AOP有什么区别？
+  - Spring AOP基于动态代理实现方式
+  - AspectJ基于静态代理实现方式
 
 # spring机制与实现 
 
@@ -69,7 +163,11 @@
 
 ## 事务 
 
-
+- Spring支持的事务管理类型
+  - 声明式事务管理
+    - 事务管理与业务代码分离。仅使用注解或基于XML的配置来管理事务
+  - 程序化事务管理
+    - 在编程的帮助下管理事务。
 
 
 
