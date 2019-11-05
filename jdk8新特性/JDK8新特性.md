@@ -60,6 +60,26 @@
 
 
 
+
+
+- > filter(筛选)
+  >
+  > map（转换）
+  >
+  > distinct（去重）
+  >
+  > sorted（排序）
+  >
+  > limit（限制返回个数）
+  >
+  > skip（删除元素）
+  >
+  > reduce（聚合）
+  >
+  > min（求最小值）
+  >
+  > anyMatch/allMatch/noneMatch（匹配）
+
 ## Stream
 
 ![](/images/QQ截图20180822153926.png)
