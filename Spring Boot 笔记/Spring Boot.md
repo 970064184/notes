@@ -1,6 +1,7 @@
 ![](images/16a53b47847b0849.png)
 
-
+- springboot启动流程：
+  - 主要步骤首先要配置environment，然后准备context上下文，包括执行applicationContext的后置处理、初始化initializer、通知listener处理contextPrepared和contextLoaded事件。最后执行refreshContext，也就是spring介绍过的AbstractApplicationContext类的refresh方法。
 
 # **一、**Spring Boot 入门
 

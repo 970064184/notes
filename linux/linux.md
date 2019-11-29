@@ -339,8 +339,26 @@ https://blog.csdn.net/zhangliao613/article/details/79021606
   - 文件内过滤查找，管道符“|”，表示将前一个命令的处理结果输出传递给后面的命令处理
   - grep [选项]查找内容 源文件
     - -n：显示匹配行及行号
+    
     - -i：忽略字母大小写
+    
     - ![](images/QQ截图20181120110957.png)
+    
+    - ```less
+      #grep -A 5 'parttern' filename //打印匹配行的后5行
+      #grep -B 5 'parttern' filename //打印匹配行的前5行
+      #grep -C 5 'parttern' filename //打印匹配行的前后5行
+      #grep -5 'parttern' filename //打印匹配行的前后5行 
+      #tail -n 5 filename 查看文件最后5行内容
+      #head -n 5 filename 查看文件前5行内容
+      sed -n '5,10p' 查看文件5-10行内容 
+      tac filename |grep -B 5 'parttern' filename //从后往前输出
+      tac error.log |more
+      ```
+    
+    - 
+
+
 
 ## 压缩和解压缩类 
 
@@ -450,7 +468,18 @@ https://blog.csdn.net/zhangliao613/article/details/79021606
     >
     > 
 
-    
+    > #!/bin/bash
+    > curl http://10.123.104.135:8883/test/community/attendance/generatedRecord?appid=8Q8W0f\&secered=B8UL5f6AvW 
+    > echo "$(date '+%Y-%m-%d %H:%M:%S')" >> /usr/local/community-crondtab/log/test.txt
+    >
+    > crontab -l 
+    >
+    > crontab -e
+    >
+    > 1 8 1 * *  /mnt/data/files/crontab/cron01.sh
+    > 3 8 1 * *  /mnt/data/files/crontab/cron02.sh
+    > 5 8 1 * *  /mnt/data/files/crontab/cron03.sh
+    > 7 8 1 * *  /mnt/data/files/crontab/cron04.sh
 
 ## 磁盘查询情况 
 

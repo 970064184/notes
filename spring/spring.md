@@ -1,3 +1,64 @@
+# 容器
+
+> 添加bean的几种方式：
+>
+> - @Configuration & @Bean【导入第三方包里面的组件】
+> - @Component （@Controller、@Service、@repository【自己写的类】）
+> - @Scope：作用域（默认是单实例，IOC容器启动会调用方法创建对象放到IOC容器中）
+> - @Lazy：懒加载（容器启动不创建对象。第一次使用（获取）Bean创建对象，并初始化）（只针对单实例bean）
+> - @Conditional：按条件注册bean
+> - @Import【快速给容器中导入一个组件】
+>   - @ImportSelector：返回需要导入的组件的全类名数组
+>   - @ImportBeanDefinitionRegistrar：
+>
+> - FactoryBean：工厂Bean
+>
+> - @Bean
+>
+>   - init-method和destory-method
+>
+>   - 实现InitializingBean（定义初始化逻辑）
+>
+>   - 实现DisposableBean（定义销毁逻辑）
+>
+>   - @PostConstruct：在bean创建完成并且属性赋值完成；来执行初始化方法
+>
+>   - @PreDestroy：在容器销毁bean之前通知我们进行清理工作
+>
+>   - 实现BeanPostProcessor：bean的后置处理器（在初始化前后进行处理工作）
+>
+>     - postProcessorBeforeInitialization：在初始化之前工作
+>
+>     - postProcessorAfterInitialization：在初始化之后工作
+>
+>     - 原理：
+>
+>       ```java
+>       populateBean(...);//给bean进行属性赋值
+>       initializationBean{
+>       applyBeanPostProcessorBeforeInitialization(...);
+>       invokeInitMethods(...);//执行初始化
+>       applyBeanPostProcessorsAfterInitialization(...);
+>       }
+>       ```
+>
+>     - spring底层对BeanPostProcessor的使用
+>
+>       ```java
+>       bean 赋值，注入其他组件，@Autowired，生命周期注解功能，@Async，xxx BeanPostProcessor;
+>       AutowiredAnnotationBeanPostProcessor
+>           
+>           
+>       ```
+>
+> 属性赋值：
+>
+> - 
+
+# 扩展原理
+
+
+
 ![](images/16a53b474aaceee0.png)
 
 - spring framework
@@ -80,6 +141,13 @@
       12. 完成上下文的刷新工作，调用LifecycleProcessor的onFresh()方法以及发布ContextRefreshedEvent事件
       13. 在finally中，执行第十三步，重置公共的缓存，比如ReflectionUtils中的缓存、AnnotationUtils中缓存等
 
+## 依赖注入 
+
+- 依赖注入，控制反转（IOC）的一方面。它是指不创建对象，而是描述它们应该如何被创建。你并不直接在代码中将组件和服务的联系写出来，而是在配置文件中描述哪些组件需要哪些服务。一个容器（IOC容器）就负责将它们全部关联起来。
+- 有哪些不同类型的IOC（依赖注入）？
+  - 基于构造器的依赖注入：是通过调用拥有多个参数的类构造器来实现的，每个参数都代表一个对其他类的依赖
+  - 基于setter的依赖注入：是在容器调用无参数的构造器或无参数的静态工厂方法来实例化一个bean后，然后调用bean方法上的setter方法来实现的。
+
 # Beans（context上下文和bean）
 
 -  什么是spring bean？
@@ -89,7 +157,13 @@
   - Bean是基于用户提供给容器的配置元数据创建
   - 是构成用户应用程序主干的对象
 
-- spring 提供了哪些配置方式？
+-  spring的bean的定义包含些什么？
+
+   - 包含容器需要的如何创建bean，它的生命周期的细节和它的依赖的所有配置元数据
+
+     - > 例如，bean标签有两个重要的属性（init-method和destory-method）使用它们就可以定义你自己的初始化和destory方法。注解：@PostConstruct和@PreDestory
+
+- spring 提供了哪些配置（元数据）方式？
 
   - 基于xml配置
 
@@ -120,18 +194,10 @@
   - Global-session：被限定于全局portletSession的生命周期范围内。
   - （仅当用户使用支持Web的ApplicationContext时，最后三个才可用）
 
-- Spring bean容器的生命周期：？
-  - Spring容器根据配置中的bean定义中实例化bean
-  - SPring使用依赖注入填充所有属性，如bean中所定义的配置
-  - 如果bean实现BeanNameAware接口，则工厂通过传递bean的ID来调用setBeanName()
-  - 如果bean实现BeanFactoryAware接口，工厂通过传递自身的实例来调用setBeanFactory
-  - 如果存在于bean关联的任何BeanPOSTProcessors，则调用preProcessBeforeInitialzation()方法
-  - 如果为bean指定了init方法（<bean>的init-method属性，那么将调用它
-  - 最后，如果存在于bean关联的任何BeanPOSTProcessors，则将调用postProcessAfterInitialization()方法
-  - 如果bean实现DisposableBean接口，当spring容器关闭时，会调用destroy()
-  - 如果为bean指定了destory方法（<bean>的destroy-method属性，那么将调用它
+  
 
 - ？什么是Spring装配 ？
+
 - 自动装配有哪些方式？
   - no
     - 默认设置，表示没有自动装配。应使用显示bean引用进行装配
@@ -143,6 +209,18 @@
     - 通过调用类的构造函数来注入依赖项
   - autodetect
     - 首先容器尝试通过构造函数使用autowire装配，如果不能，则尝试通过byType自动装配
+
+## Spring bean容器的生命周期
+
+> spring并不是一启动容器就开启bean的实例化进程，只有当客户端通过显式或隐式的方式调用BeanFactory的getBean()方法来请求某个实例对象的时候，才会触发相应的bean的实例化进程，当然也可直接使用ApplicationContext容器，因为该容器启动的时候会立刻调用注册到该容器所有bean定义的实例化方法。当然对于 BeanFactory 容器而言并不是所有的 getBean() 方法都会触发实例化进程，比如 signleton 类型的 bean，该类型的 bean 只会在第一次调用 getBean() 的时候才会触发，而后续的调用则会直接返回容器缓存中的实例对象。
+>
+> getBean()只是bean实例化进程的入口，真正的实现逻辑其实是在AbstractAutowireCapableBeanFactory的doCreateBean()实现
+>
+> ![](images/16a6430f314df3f8.png)
+>
+> https://juejin.im/post/5cc5ae4f51882525082e1f47
+
+
 
 # AOP （面向切面编程）
 
@@ -230,14 +308,201 @@ https://blog.csdn.net/a909301740/article/details/78379720
 
 # Spring缓存 
 
+
+
 - 声明某些方法使用缓存
   - @Cacheable
     - value：指定cache名称
     - key：
     - condition：
 - 配置spring对cache的支持
-
 - （对于一个支持缓存的方法，spring会在其被调用后将其返回值缓存起来，以保证下次利用同样的参数来执行该方法时可以直接从缓存中获取结果，而不需要再次执行该方法。spring在缓存方法的返回值时是以键值对进行缓存的，值就是方法的返回结果，至于键的话，spring又支持两种策略，默认策略和自定义策略。需注意的是，当一个支持缓存的方法在对象内部被调用时是不会触发缓存功能的。）
+- @Cacheable(cacheNames = {"code_output"}, key = "methodName + T(String).valueOf(#showBoss)", unless = "#result == null || #result.size() <= 0")
+
+
+## 开始使用
+
+ https://www.cnblogs.com/yueshutong/p/9381540.html 
+
+### 1.开始使用前需要导入依赖[#](https://www.cnblogs.com/yueshutong/p/9381540.html#2821879697)
+
+```
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+```
+
+### 2.然后在启动类注解@EnableCaching开启缓存[#](https://www.cnblogs.com/yueshutong/p/9381540.html#3183317230)
+
+```
+@SpringBootApplication
+@EnableCaching  //开启缓存
+public class DemoApplication{
+
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+
+}
+```
+
+### 3.缓存@Cacheable``[#](https://www.cnblogs.com/yueshutong/p/9381540.html#2470143842)
+
+`@Cacheable`注解会先查询是否已经有缓存，有会使用缓存，没有则会执行方法并缓存。
+
+```
+    @Cacheable(value = "emp" ,key = "targetClass + methodName +#p0")
+    public List<NewJob> queryAll(User uid) {
+        return newJobDao.findAllByUid(uid);
+    }
+```
+
+此处的`value`是必需的，它指定了你的缓存存放在哪块命名空间。
+
+此处的`key`是使用的spEL表达式，参考上章。这里有一个小坑，如果你把`methodName`换成`method`运行会报错，观察它们的返回类型，原因在于`methodName`是`String`而`methoh`是`Method`。
+
+此处的`User`实体类一定要实现序列化`public class User implements Serializable`，否则会报`java.io.NotSerializableException`异常。
+
+到这里，你已经可以运行程序检验缓存功能是否实现。
+
+**深入源码，查看它的其它属性**
+
+我们打开`@Cacheable`注解的源码，可以看到该注解提供的其他属性，如：
+
+```
+String[] cacheNames() default {}; //和value注解差不多，二选一
+String keyGenerator() default ""; //key的生成器。key/keyGenerator二选一使用
+String cacheManager() default ""; //指定缓存管理器
+String cacheResolver() default ""; //或者指定获取解析器
+String condition() default ""; //条件符合则缓存
+String unless() default ""; //条件符合则不缓存
+boolean sync() default false; //是否使用异步模式
+```
+
+### 4.配置@CacheConfig[#](https://www.cnblogs.com/yueshutong/p/9381540.html#1707994567)
+
+当我们需要缓存的地方越来越多，你可以使用`@CacheConfig(cacheNames = {"myCache"})`注解来统一指定`value`的值，这时可省略`value`，如果你在你的方法依旧写上了`value`，那么依然以方法的`value`值为准。
+
+使用方法如下：
+
+```
+@CacheConfig(cacheNames = {"myCache"})
+public class BotRelationServiceImpl implements BotRelationService {
+    @Override
+    @Cacheable(key = "targetClass + methodName +#p0")//此处没写value
+    public List<BotRelation> findAllLimit(int num) {
+        return botRelationRepository.findAllLimit(num);
+    }
+    .....
+}
+```
+
+**查看它的其它属性**
+
+```
+String keyGenerator() default "";  //key的生成器。key/keyGenerator二选一使用
+String cacheManager() default "";  //指定缓存管理器
+String cacheResolver() default ""; //或者指定获取解析器
+```
+
+### 5.更新@CachePut[#](https://www.cnblogs.com/yueshutong/p/9381540.html#122175308)
+
+`@CachePut`注解的作用 主要针对方法配置，能够根据方法的请求参数对其结果进行缓存，和 `@Cacheable` 不同的是，它每次都会触发真实方法的调用 。简单来说就是用户更新缓存数据。但需要注意的是该注解的`value` 和 `key` 必须与要更新的缓存相同，也就是与`@Cacheable` 相同。示例：
+
+```
+    @CachePut(value = "emp", key = "targetClass + #p0")
+    public NewJob updata(NewJob job) {
+        NewJob newJob = newJobDao.findAllById(job.getId());
+        newJob.updata(job);
+        return job;
+    }
+
+    @Cacheable(value = "emp", key = "targetClass +#p0")//清空缓存
+    public NewJob save(NewJob job) {
+        newJobDao.save(job);
+        return job;
+    }
+```
+
+**查看它的其它属性**
+
+```
+String[] cacheNames() default {}; //与value二选一
+String keyGenerator() default "";  //key的生成器。key/keyGenerator二选一使用
+String cacheManager() default "";  //指定缓存管理器
+String cacheResolver() default ""; //或者指定获取解析器
+String condition() default ""; //条件符合则缓存
+String unless() default ""; //条件符合则不缓存
+```
+
+### 6.清除@CacheEvict[#](https://www.cnblogs.com/yueshutong/p/9381540.html#1946902007)
+
+`@CachEvict` 的作用 主要针对方法配置，能够根据一定的条件对缓存进行清空 。
+
+| 属性             | 解释                                                         | 示例                                                 |
+| ---------------- | ------------------------------------------------------------ | ---------------------------------------------------- |
+| allEntries       | 是否清空所有缓存内容，缺省为 false，如果指定为 true，则方法调用后将立即清空所有缓存 | @CachEvict(value=”testcache”,allEntries=true)        |
+| beforeInvocation | 是否在方法执行前就清空，缺省为 false，如果指定为 true，则在方法还没有执行的时候就清空缓存，缺省情况下，如果方法执行抛出异常，则不会清空缓存 | @CachEvict(value=”testcache”，beforeInvocation=true) |
+
+示例：
+
+```
+    @Cacheable(value = "emp",key = "#p0.id")
+    public NewJob save(NewJob job) {
+        newJobDao.save(job);
+        return job;
+    }
+
+    //清除一条缓存，key为要清空的数据
+    @CacheEvict(value="emp",key="#id")
+    public void delect(int id) {
+        newJobDao.deleteAllById(id);
+    }
+
+    //方法调用后清空所有缓存
+    @CacheEvict(value="accountCache",allEntries=true)
+    public void delectAll() {
+        newJobDao.deleteAll();
+    }
+
+    //方法调用前清空所有缓存
+    @CacheEvict(value="accountCache",beforeInvocation=true)
+    public void delectAll() {
+        newJobDao.deleteAll();
+    }
+```
+
+**其他属性**
+
+```
+String[] cacheNames() default {}; //与value二选一
+String keyGenerator() default "";  //key的生成器。key/keyGenerator二选一使用
+String cacheManager() default "";  //指定缓存管理器
+String cacheResolver() default ""; //或者指定获取解析器
+String condition() default ""; //条件符合则清空
+```
+
+### 7.组合@Caching[#](https://www.cnblogs.com/yueshutong/p/9381540.html#2085175017)
+
+有时候我们可能组合多个Cache注解使用，此时就需要@Caching组合多个注解标签了。
+
+```
+    @Caching(cacheable = {
+            @Cacheable(value = "emp",key = "#p0"),
+            ...
+    },
+    put = {
+            @CachePut(value = "emp",key = "#p0"),
+            ...
+    },evict = {
+            @CacheEvict(value = "emp",key = "#p0"),
+            ....
+    })
+    public User save(User user) {
+        ....
+    }
+```
 
 # spring循环依赖及解决方式 
 

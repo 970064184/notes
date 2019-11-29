@@ -396,3 +396,25 @@ https://blog.csdn.net/ityouknow/article/details/78037470
 
 # 监控工具
 
+# 实战
+
+```shell
+//https://blog.csdn.net/fuyuwei2015/article/details/73256425
+top
+printf "%x \n" 线程ID  //把线程十进制的线程ID转换为十六进制
+jstack -F 线程ID > dump.txt
+more dump.txt    //查看线程ID对应的位置，或nid=0xtid的位置
+//或者：
+jstack pid |grep '0xtid' -C5 --color
+
+
+```
+
+```shell
+ jmap -dump:live,format=b,file=/dump201612271310.dat 384
+```
+
+## CPU飙升、内存不足解决办法
+
+- 限制每个进程的内存大小、CPU使用率（cpulimit）(docker 可在启动时-m 带参数)
+- 

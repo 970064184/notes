@@ -2978,7 +2978,7 @@ https://juejin.im/post/5b45ef49f265da0f5140489c#heading-4
 > - （一次内存泄露似乎不会有大的影响，但内存泄露堆积后的后果就是内存溢出）
 > - out of memory内存溢出：指程序申请内存时，没有足够的内存供申请者使用，或者说，给了你一块存储int类型数据的存储空间，但是你却存储long类型的数据，那么结果就是内存不够用，此时就会报错OOM，即所谓的内存溢出。
 
-> - 一个原因是内存不够（如递归的成熟太多等）
+> - 一个原因是内存不够（如递归的层数太多等）
 >   - https://blog.csdn.net/lixld/article/details/80101972
 >   - 解决办法：
 >     - -Xms3062m
@@ -3026,4 +3026,61 @@ https://juejin.im/post/5b45ef49f265da0f5140489c#heading-4
 - 编译优化部分：前端编译器javac的编译过程、AST抽象语法树、编译期优化和运行期优化。编译优化的常用技术，包括公共子表达式的消除、方法内联、逃逸分析、栈上分配、同步消除等。
 
 # java数据结构与算法基础 
+
+# JAVA常用工具类库 
+
+ https://blog.csdn.net/zzti_erlie/article/details/103102151 
+
+## Apache Commons 
+
+### BeanUtils
+
+```java
+//map 和 bean的互相转换
+bean -->map
+map = BeanUtils.describe(user);
+map-->bean
+BeanUtils.populate(user,map);
+```
+
+### Codec
+
+```java
+//Base64
+Base64.encodeBase64String(byte[] binaryData)
+Base64.decodeBase64(String base64String)
+//MD5
+DigestUtils.md5Hex(String data)
+//URL
+URLCodec.decodeUrl(byte[] bytes);
+URLCodec.encodeUrl(BitSet urlsafe, byte[] bytes);    
+```
+
+### Collections 
+
+```java
+//判空
+CollectionUtils.isEmpty(collA);
+//交集
+CollectionUtils.retainAll(collA, collB);
+//并集
+CollectionUtils.union(collA, collB);
+//差集
+CollectionUtils.subtract(collA, collB);
+//判等
+CollectionUtils.isEqualCollection(collA, collB);
+```
+
+### StringUtils
+
+```java
+// 10位英字  
+System.out.println(RandomStringUtils.randomAlphabetic(10));    
+// 10位英数  
+System.out.println(RandomStringUtils.randomAlphanumeric(10));    
+// 10位ASCII码  
+System.out.println(RandomStringUtils.randomAscii(10));   
+// 指定文字10位  
+System.out.println(RandomStringUtils.random(10, "abcde"));  
+```
 
