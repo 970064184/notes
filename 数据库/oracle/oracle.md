@@ -94,7 +94,7 @@ https://blog.csdn.net/tonghui_tonghui/article/details/76696260
 
 # 锁表
 
-```java
+```sql
 select session_id from v$locked_object;
 SELECT sid, serial#, username, osuser FROM v$session where sid =3768;
 SELECT SID FROM V$MYSTAT WHERE ROWNUM =1;
@@ -106,6 +106,13 @@ AND l.session_id = s.sid;
 
 --alter system kill session 'sid, serial#'; 
 ALTER system kill session '3768, 10751'; 
+
+SELECT uo.OBJECT_NAME, s."SQL_ID", s."SQL_TEXT", sess."SID", sess."SERIAL#",s.*
+FROM v$locked_object lo-- ON lo."SESSION_ID" = sess."SID"
+JOIN user_objects uo ON uo.OBJECT_ID = lo."OBJECT_ID" AND uo.OBJECT_NAME = UPPER('tb_shop_store')
+JOIN v$session sess ON lo."SESSION_ID" = sess."SID"
+JOIN v$sql s ON sess."SQL_ID" = s."SQL_ID";
+
 
 
 ```

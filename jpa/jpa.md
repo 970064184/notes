@@ -7,7 +7,7 @@
     @DynamicUpdate
     @DynamicInsert
     
-    
+    //（好像不需要加底下这块）
     @Column(name="auth_type",columnDefinition = "Integer default 2")
     private Integer authType;
     ```

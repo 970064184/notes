@@ -346,3 +346,249 @@ https://blog.csdn.net/w348399060/article/details/70158125
 - where和on的区别
   - on是两者join形成新表时用到的匹配条件
   - where是对已经搜索出的结果的过滤条件
+
+# SQL索引优化解决办法 
+
+https://juejin.im/post/5d6e6d42518825103e54565c#heading-0
+
+```
+CREATE TABLE `employees` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(24) NOT NULL DEFAULT '' COMMENT '姓名',
+  `age` int(20) NOT NULL DEFAULT '0' COMMENT '年龄',
+  `position` varchar(20) NOT NULL DEFAULT '' COMMENT '职位',
+  `hire_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '入职时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_name_age_position` (`name`,`age`,`position`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='员工表';
+
+insert into employees(name,age,position,hire_time) values('LiLei', 22, 'manager', NOW())
+insert into employees(name,age,position,hire_time) values('HanMeimei', 23, 'dev', NOW())
+insert into employees(name,age,position,hire_time) values('Lucy', 23, 'dev', NOW())
+复制代码
+```
+
+#### 全值匹配
+
+索引的字段类型是varchar(n)：2字节存储字符串长度，如果是utf-8， 则长度是3n+2
+
+```
+EXPLAIN select * from employees where name='LiLei';
+复制代码
+```
+
+
+
+![explain解析](https://user-gold-cdn.xitu.io/2019/9/3/16cf75aa06aaa24f?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+```
+EXPLAIN select * from employees where name='LiLei' AND age = 22;
+复制代码
+```
+
+
+
+![explain解析](https://user-gold-cdn.xitu.io/2019/9/3/16cf75aa2cabe17f?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+```
+EXPLAIN select * from employees where name='LiLei' AND age = 22 AND position = 'manager';
+复制代码
+```
+
+
+
+![explain解析](https://user-gold-cdn.xitu.io/2019/9/3/16cf75aa5225292e?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+#### 最左前缀法则
+
+如果索引是多列，要最受最左前缀法则。指的是查询从索引的最左前列开始并且不跳过索引中的列。以下两条sql根据最左前缀法则，都不会走索引。
+
+```
+EXPLAIN select * from employees where age = 22 AND position='manager';
+EXPLAIN select * from employees where position ='manager';
+复制代码
+```
+
+
+
+![explain解析](https://user-gold-cdn.xitu.io/2019/9/3/16cf75aa74e6bd3c?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+#### 索引失效
+
+不要在索引列上做任何操作（计算、函数、类型转换），会导致索引失效而转向全表扫描。
+
+```
+EXPLAIN select * from employees where name='LiLei';
+复制代码
+```
+
+
+
+![explain解析](https://user-gold-cdn.xitu.io/2019/9/3/16cf75aa99cea403?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+```
+EXPLAIN select * from employees where left(name, 3)='LiLei';
+复制代码
+```
+
+
+
+![explain解析](https://user-gold-cdn.xitu.io/2019/9/3/16cf75aabf6fd7f0?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+给hire_time增加一个普通索引：
+
+```
+alter table `employees` ADD INDEX `idx_hire_time`(`hire_time`) USING BTREE;
+EXPLAIN select * from employees where date(hire_time) = '2019-08-25';
+复制代码
+```
+
+
+
+![explain解析](https://user-gold-cdn.xitu.io/2019/9/3/16cf75aaea6eef45?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+还原最初索引状态
+
+```
+ALTER TABLE `employees` DROP INDEX `idx_hire_time`;
+复制代码
+```
+
+#### 存储引擎不能使用索引中范围条件右边的列
+
+```
+-- EXPLAIN SELECT * FROM employees WHERE name ='LiLei' AND age=22 AND position ='manager';
+EXPLAIN SELECT * FROM employees WHERE name ='LiLei' AND age>22 AND position ='manager';
+复制代码
+```
+
+
+
+![explain解析](https://user-gold-cdn.xitu.io/2019/9/3/16cf75ab1db4e6bb?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+ 看到key_len这个索引长度是78， 也就是只使用到了前两个字段name和age，postition没有使用到索引的。
+
+
+
+#### 覆盖索引
+
+尽量使用覆盖索引（只访问索引的查询（索引列包含查询列）），减少selelct * 语句。
+
+```
+EXPLAIN SELECT name,age,position FROM employees WHERE name ='LiLei' AND age=22 AND position ='manager';
+复制代码
+```
+
+
+
+![explain解析](https://user-gold-cdn.xitu.io/2019/9/3/16cf75ab44b9d936?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+#### 条件判断
+
+mysql在使用不等于（! = 或者 <>）的时候无法使用索引会导致全表扫描
+
+```
+EXPLAIN SELECT * FROM employees WHERE name !='LiLei' ;
+复制代码
+```
+
+
+
+![explain解析](https://user-gold-cdn.xitu.io/2019/9/3/16cf75ab6b7ebd51?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+#### 空值判断
+
+is null，is not null也无法使用索引
+
+```
+EXPLAIN SELECT * FROM employees WHERE name is null;
+复制代码
+```
+
+
+
+![explain解析](https://user-gold-cdn.xitu.io/2019/9/3/16cf75ab949a41b0?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+#### like
+
+like以通配符开头（‘$abc’）mysql索引失效会变成全表扫描操作
+
+```
+EXPLAIN SELECT * FROM employees WHERE name LIKE '%Lei';
+复制代码
+```
+
+
+
+![explain解析](https://user-gold-cdn.xitu.io/2019/9/3/16cf75abbbacde8e?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+#### 字符串不加单引号索引失效
+
+```
+EXPLAIN SELECT * FROM employees WHERE name ='1000';
+EXPLAIN SELECT * FROM employees WHERE name =1000;
+复制代码
+```
+
+
+
+![explain解析](https://user-gold-cdn.xitu.io/2019/9/3/16cf75abf844ac22?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+ 不加单引号的字符串，mysql底层会使用cust函数将其转换为字符串，此时索引失效。
+
+
+
+#### or&in少使用
+
+少用or或in，用它查询时，mysql不一定使用索引，mysql内部优化器会根据索引比例、表大小等多个因素整体评估是否使用索引。
+
+```
+EXPLAIN SELECT * FROM employees WHERE name ='LiLei' or name='HanMeimei';
+复制代码
+```
+
+
+
+![explain解析](https://user-gold-cdn.xitu.io/2019/9/3/16cf75ac1dd15ef9?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+#### 范围查询优化
+
+给年龄添加单值索引
+
+```
+ALTER TABLE `employees`ADD INDEX `idx_age`(`age`) USING BTREE;
+EXPLAIN select * from employees where age > 1 and age <= 2000;
+复制代码
+```
+
+
+
+![explain解析](https://user-gold-cdn.xitu.io/2019/9/3/16cf75ac42411b06?imageView2/0/w/1280/h/960/format/webp/ignore-error/1)
+
+
+
+没有走索引原因：mysql内部优化器会根据检索比例、表大小等多个因素整体评估是否使用索引。 这个例子没有走索引可能是因为单次数据量查询过大导致优化器最终选择不走索引。 优化方法：可以将大的范围拆分成多个小范围。
