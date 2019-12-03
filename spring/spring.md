@@ -33,27 +33,93 @@
 >
 >     - 原理：
 >
->       ```java
->       populateBean(...);//给bean进行属性赋值
->       initializationBean{
->       applyBeanPostProcessorBeforeInitialization(...);
->       invokeInitMethods(...);//执行初始化
->       applyBeanPostProcessorsAfterInitialization(...);
->       }
->       ```
+>    ```java
+>    populateBean(...);//给bean进行属性赋值
+>    initializationBean{
+>    applyBeanPostProcessorBeforeInitialization(...);
+>    invokeInitMethods(...);//执行初始化
+>    applyBeanPostProcessorsAfterInitialization(...);
+>    }
+>    ```
 >
 >     - spring底层对BeanPostProcessor的使用
 >
->       ```java
->       bean 赋值，注入其他组件，@Autowired，生命周期注解功能，@Async，xxx BeanPostProcessor;
->       AutowiredAnnotationBeanPostProcessor
->           
->           
->       ```
+>    ```java
+>    bean 赋值，注入其他组件，@Autowired，生命周期注解功能，@Async，xxx BeanPostProcessor;
+>    AutowiredAnnotationBeanPostProcessor     
+>        
+>    ```
 >
 > 属性赋值：
 >
-> - 
+> - @Value
+> - @PropertySource(value={"classpath:/person.properties"})：读取外部配置文件中的环境变量
+>   - @Value("${person.name}")
+>
+> 
+>
+> 自动装配：
+>
+> AutowiredAnnotationBeanPostProcessor：解析完成自动装配功能
+>
+> - 自动装配：spring利用依赖注入（DI），完成对IOC容器中各个组件的依赖关系赋值
+>
+> - @Autowired & @Qualifier  @primary  @Resource
+>
+> - @Autowired：自动注入
+>
+>   - > - 可标注在方法位置上
+>     >
+>     > - 标注在构造器上，如果组件只有一个有参构造器，这个有参构造器的@Autowired可省略，参数位置的组件还是可以自动从容器中获取
+>     > - 可标注在参数位置上
+>
+>   - 默认优先按照类型去容器中找对应的组件：applicationContext.getBean(BookDao.class);
+>
+>   - 如果找到多个相同类型的组件，再将属性的名称（默认的是类名首字母小写）作为组件的Id去容器中查找applicationContext.getBean("bookDao")
+>
+>   - @Qualifier("bookDao")：指定需要装配的组件的Id，而不是使用属性名
+>
+>   - 自动装配默认一定要将属性赋值好，没有就会报错，可以使用@Autowired(required=false)
+>
+>   - ```java
+>     @Autowired
+>     private BookDao bookDao;
+>     
+>     @Autowired
+>     private BookDao（类型） bookDao2(属性名);
+>     ```
+>
+>   - 
+>
+> - @Primary：让spring进行自动装配的时候，默认使用首选bean
+>
+> - @Resource @Inject
+>
+> - @Resource 默认是按照组件名称进行装配的（没能支持@Primary功能，没有支持@Autowired(required=false)）
+>
+> - @Inject：自动装入和Autowired功能意义，没有required=false功能
+>
+>   - 需要导入依赖：javax.inject
+>
+> - 自定义组件想要使用spring容器底层的一些组件（ApplicationContext、BeanFactory，xxx）；
+>
+>   - 自定义组件实现xxxAware：在创建对象的时候，会调用接口规定的方法注入相关组件：Aware
+>   - 把spring底层一些组件注入到自定义的bean中，xxxAware：功能使用xxxProcessor（ApplicationContextAware-->ApplicationContextAwareProcessor）
+>
+> - @Profile：spring为我们提供的可以根据当前环境，动态的激活和切换一系列组件的功能，不指定，任何环境下都能注册这个组件
+>
+>   - 加了环境标识的bean，只有在这个环境被激活的时候才能注册到容器中，默认是default环境
+>
+>   - > spring如何切换环境？
+>     >
+>     > - 使用命令行动态参数：-Dspring.profiles.active=test
+>     > - 写代码的方式激活
+>     >   - 创建一个无参的applicationContext
+>     >   - 设置需要激活的环境
+>     >   - 注册主配置类
+>     >   - 启动刷新容器
+>
+>   - 写在配置类上，只有是指定的环境的时候，整个配置类里面的所有配置才能
 
 # 扩展原理
 
