@@ -1,5 +1,13 @@
 # 容器
 
+## spring 如何设计容器的？
+
+- spring设计了两个接口用以表示容器
+  - BeanFactory
+  - ApplicationContext
+- BeanFactory可以理解为就是个HashMap，key是BeanName，value是Bean实例。通常只提供注册（put），获取（get）这两个功能。（低级容器）
+- ApplicationContext（高级容器）比BeanFactory多了更多功能。它继承了多个接口。盖接口定义了一个refresh方法，用于刷新整个容器，即重新加载/刷新所有的bean，代表着整个大容器的所有功能。
+
 > 添加bean的几种方式：
 >
 > - @Configuration & @Bean【导入第三方包里面的组件】
@@ -42,13 +50,104 @@
 > }
 > ```
 >
+> ```java
+> -spring底层对BeanPostProcessor的使用
+> ```
+>
+> ```java
+> bean 赋值，注入其他组件，@Autowired，生命周期注解功能，@Async，xxx BeanPostProcessor;
+> AutowiredAnnotationBeanPostProcessor     
+>     
+> ```
+>
+> 属性赋值：
+>
+> - @Value
+> - @PropertySource(value={"classpath:/person.properties"})：读取外部配置文件中的环境变量
+>   - @Value("${person.name}")
+>
+> 
+>
+> 自动装配：
+>
+> AutowiredAnnotationBeanPostProcessor：解析完成自动装配功能
+>
+> - 自动装配：spring利用依赖注入（DI），完成对IOC容器中各个组件的依赖关系赋值
+>
+> - @Autowired & @Qualifier  @primary  @Resource
+>
+> - @Autowired：自动注入
+>
+>   - > - 可标注在方法位置上
+>  >
+>     > - 标注在构造器上，如果组件只有一个有参构造器，这个有参构造器的@Autowired可省略，参数位置的组件还是可以自动从容器中获取
+>     > - 可标注在参数位置上
+>
+>   - 默认优先按照类型去容器中找对应的组件：applicationContext.getBean(BookDao.class);
+>
+>   - 如果找到多个相同类型的组件，再将属性的名称（默认的是类名首字母小写）作为组件的Id去容器中查找applicationContext.getBean("bookDao")
+>
+>   - @Qualifier("bookDao")：指定需要装配的组件的Id，而不是使用属性名
+>
+>   - 自动装配默认一定要将属性赋值好，没有就会报错，可以使用@Autowired(required=false)
+>
+>   - ```java
+>  @Autowired
+>  private BookDao bookDao;
+>  ```
+>
+>  @Autowired
+>  private BookDao（类型） bookDao2(属性名);
+>  ```java
+> 
+>   - 
+> 
+> - @Primary：让spring进行自动装配的时候，默认使用首选bean
+> 
+> - @Resource @Inject
+> 
+> - @Resource 默认是按照组件名称进行装配的（没能支持@Primary功能，没有支持@Autowired(required=false)）
+> 
+> - @Inject：自动装入和Autowired功能意义，没有required=false功能
+> 
+>   - 需要导入依赖：javax.inject
+> 
+> - 自定义组件想要使用spring容器底层的一些组件（ApplicationContext、BeanFactory，xxx）；
+> 
+>   - 自定义组件实现xxxAware：在创建对象的时候，会调用接口规定的方法注入相关组件：Aware
+>   - 把spring底层一些组件注入到自定义的bean中，xxxAware：功能使用xxxProcessor（ApplicationContextAware-->ApplicationContextAwareProcessor）
+> 
+> - @Profile：spring为我们提供的可以根据当前环境，动态的激活和切换一系列组件的功能，不指定，任何环境下都能注册这个组件
+> 
+>   - 加了环境标识的bean，只有在这个环境被激活的时候才能注册到容器中，默认是default环境
+> 
+>   - > spring如何切换环境？
+>  >
+>     > - 使用命令行动态参数：-Dspring.profiles.active=test
+>     > - 写代码的方式激活
+>     >   - 创建一个无参的applicationContext
+>     >   - 设置需要激活的环境
+>     >   - 注册主配置类
+>     >   - 启动刷新容器
+> 
+>   - 写在配置类上，只有是指定的环境的时候，整个配置类里面的所有配置才能
+> 
+> ​```java
+> populateBean(...);//给bean进行属性赋值
+> initializationBean{
+> applyBeanPostProcessorBeforeInitialization(...);
+> invokeInitMethods(...);//执行初始化
+> applyBeanPostProcessorsAfterInitialization(...);
+> }
+>  ```
+>
 >     - spring底层对BeanPostProcessor的使用
 >
 > ```java
 > bean 赋值，注入其他组件，@Autowired，生命周期注解功能，@Async，xxx BeanPostProcessor;
 > AutowiredAnnotationBeanPostProcessor
->     
->     
+>  
+>  
 > ```
 >
 > 属性赋值：
@@ -121,7 +220,71 @@
 
 
 
+- 声明书事务@EnableTransactionManagement
+  - 原理：
+    - @EnableTransactionManagement利用TransactionManagementConfigurationSelector给容器中会导入组件（AutoProxyRegistrar、ProxyTransactionManagementConfiguration）
+
 # 扩展原理
+
+- BeanFactoryPostProcessor：beanFactory的后置处理器
+  - 在BeanFactory标准初始化之后调用，来定制和修改BeanFactory的内容；所有的bean定义已经保存加载到beanFactory，但是bean的实例还未创建
+  - BeanFactoryPostProcessor原理：
+    - IOC容器创建对象
+    - invokeBeanFactoryPostProcessors（beanFactory）
+      - 如何找到所有的BeanFactoryPostProcessor并执行他们的方法：
+        - 直接在BeanFactory中找到所有类型的BeanFactoryPostProcessor的组件，并执行他们的方法
+        - 在初始化创建其他组件前面执行
+
+- BeanDefinitionRegistry：extends BeanFactoryPostProcessor：在所有bean定义信息将被加载，bean实例还未创建的
+  - 优先于BeanFactoryPostProcessor执行：利用BeanDefinitionRegistryPostProcessor给容器中再额外添加一些组件
+  - 原理：
+    - IOC创建对象
+    - refresh()--》invokeBeanFactoryPostProcessors(beanFactory)
+    - 从容器中获取到所有的BeanDefinitionRegistryPostProcessor组件，依次触发所有的postProcessBeanDefinitionRegistry()方法
+    - 再来从容器中找到BeanFactoryPostProcessor组件；然后依次触发postProcessBeanFactory()方法
+- ApplicationListener：监听容器中发布的事件。事件驱动模型开发
+  - 步骤：
+    - 写一个监听器来监听某个事件（ApplicationEvent及其子类）
+      - (实现ApplicationEvent接口或@EventListener)
+    - 把监听器加人到容器
+    - 只要容器中有相关事件的发布，我们就能监听到这个事件
+      - ContextRefreshedEvent：容器刷新完成（所有bean都完全创建）会发布这个事件
+      - ContextClosedEvent：关闭容器会发布这个事件
+    - 发布一个事件
+  - 原理：
+    - 容器创建对象：refresh()
+    - finishRefresh()：容器刷新完成会发布ContextRefreshedEvent事件
+    - 自己发布事件
+      - 事件发布流程
+        - publishEvent(new ContextRefreshedEvent(this));
+          - 获取事件的多播器（派发器）：getApplicationEventMulticaster()
+          - multicastEvent派发事件
+          - 获取到所有的ApplicationListener
+          - invokeListener(listener,event)拿到listener回调onApplicationEvent方法
+    - 容器关闭会发布ContextClosedEvent
+
+
+
+
+
+# spring源码总结
+
+- spring容器在启动的时候，先会保存所有注册进来的Bean的定义信息；
+  - xml注册bean：<bean>
+  - 注解注册bean：@Service、@Component、@Bean。。
+- spring容器会合适的时机创建这些bean
+  - 用到这个bean的时候：利用getBean创建bean，创建好以后保存在容器中
+  - 统一创建剩下所有bean的时候：finishBeanFactoryInitialization()
+- 后置处理器：每一个bean创建完成，都会使用各种后置处理器进行处理，来增强bean的功能，例如：AutowiredAnnotationBeanPostProcessor：处理自动注入功能；AspectJAwareAdvisorAutoProxyCreator：做AOP功能（为bean来创建代理对象，通过代理对象来增强AOP功能）
+- 事件驱动模型：
+  - ApplicationListener：事件监听
+  - ApplicationEventMulticaster：事件派发
+
+
+
+
+
+
 
 
 
@@ -157,6 +320,12 @@
 ![](images/1182360-dd6f78848efc4b95.webp)
 
 # IOC（控制反转）
+
+## IOC控制反转的作用
+
+- 管理对象的创建和依赖关系的维护
+- 可以对类的统一处理，托管了类的产生过程
+- 解耦，由容器去维护具体的对象
 
 > 假设公司有产品、研发、测试等岗位。如果是公司根据岗位要求，逐个安排人选，这就是正向流程。如果反过来，不用公司来安排候选人，而是由第三方猎头来匹配岗位和候选人，然后推荐，这就是控制反转。
 >
@@ -293,7 +462,7 @@
 - AOP的基本单元是Aspect（切面）
 
 - AOP以功能进行划分，对服务顺序执行流程中的不同位置进行横切，完成各服务共同需要实现的功能。
-- AOP 的实现是通过代理模式，在调用对象的某个方法时，执行插入的切面逻辑。实现的方式有动态代理也叫运行时增强，比如jdk代理，CGLIB；静态代理是在编译时进行织入或类加载时进行织入。
+- AOP 的实现是通过代理模式，在调用对象的某个方法时，执行插入的切面逻辑。实现的方式有动态代理也叫运行时增强，比如jdk代理，CGLIB；静态代理是在编译时进行织入或类加载时进行织入。(如果要代理的对象，实现了某个接口，那么spring aop会使用jdk proxy，去创建代理对象，而对于没有实现接口的对象，就无法使用jdk proxy去进行代理了，这时候，spring aop会使用cglib，这时候spring aop会使用cglib生成一个被代理对象的子类来作为代理)
 - （关于AOP还需了解对应的Aspect、pointcut、advice等注解和具体使用方式）
 - Spring AOP 和AspectJ AOP有什么区别？
   - Spring AOP基于动态代理实现方式
