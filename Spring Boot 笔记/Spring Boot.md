@@ -1,3 +1,5 @@
+ https://juejin.im/entry/5b94cf495188255c3a2d26f8 
+
 ![](images/16a53b47847b0849.png)
 
 - springboot启动流程：
@@ -3867,6 +3869,8 @@ public ConfigurableApplicationContext run(String... args) {
 ```
 
 ## 3、事件监听机制
+
+(服务端事件监听机制：更多的用于异步通知以及监控和异常处理)
 
 配置在META-INF/spring.factories
 

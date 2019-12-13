@@ -269,5 +269,24 @@ https://blog.csdn.net/weixin_40834464/article/details/88850523
 
 
 
-![](images/1646a15f6ab8b1cc)
+![](images/1646a15f6ab8b1cc.png)
 
+
+
+# Spring Cloud Gateway
+
+> 包括协议适配、协议转发、安全策略（WAF）、防刷、流量、监控日志
+>
+> ![](images/QQ截图20191212114103.png)
+>
+> 
+
+## 坑
+
+-  webflux与mvc不兼容，如类路径中引用了webmvc会导致项目启动不起来 
+
+  ```java
+  org.springframework.context.ApplicationContextException: Unable to start web server; nested exception is org.springframework.context.ApplicationContextException: Unable to start ServletWebServerApplicationContext due to missing ServletWebServerFactory bean.
+  ```
+
+  - 不能同时引入（Web Flux(Netty)跟Web MVC(Servlet)），找了好久找不到办法，所以旧代码得重写罗
