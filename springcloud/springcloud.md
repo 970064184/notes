@@ -141,6 +141,8 @@ https://juejin.im/post/5b83466b6fb9a019b421cecc
     但是关闭自我保护模式，会有另外一个可能的问题，即隔一段时间后，可能会发生实例并未关闭，却无法通过网关访问了，此时很可能是由于网络问题，导致实例（或网关）与Eureka Server断开了连接，Eureka Server已经将其注销（网络恢复后，实例并不会再次注册），此时重启Eureka Server节点或实例，并等待一小段时间即可。
 
     综上，自我保护模式是一种应对网络异常的安全保护措施，它的架构哲学是宁可同时保留所有微服务（健康的微服务和不健康的微服务都会保留），也不盲目注销任何健康的微服务。使用自我保护模式。使用自我保护模式，可以让Eureka集群更加的健壮、稳定。
+    
+    （如果开启了自我保护模式，客户端就可能会拿到已经挂掉的服务实例，这就要求客户端必须要有容错机制（请求重试、断路器等））
 
 ## Eureka的核心类
 
@@ -151,6 +153,19 @@ https://juejin.im/post/5b83466b6fb9a019b421cecc
 ### InstanceStatus（服务实例的状态）
 
 ### ServiceInstance（服务发现的实例应用有哪些通用的信息）
+
+## 原理
+
+ https://juejin.im/post/5ce796fe6fb9a07ecb0b82cc 
+
+### 服务端 
+
+- EurekaBootStrap-->contextInitialized()-->initEurekaServerContext()-->PeerAwareInstanceRegistry()-->register()
+- 保存的数据时ConcurrentHashMap，key是registrant.getId()实例Id，value是Lease(里面存着服务实例和过期时间。。)
+
+### 客户端 
+
+- DiscoveryClient -->initScheduledTasks()（两个定时器，一个定时拉取服务名单，一个定时发送注册中心一个心跳）
 
 # 引出RestTemplate和Ribbon
 
