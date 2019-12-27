@@ -1,3 +1,5 @@
+> 
+>
 > 应用架构的发展：单体架构-->分布式架构-->SOA架构-->微服务架构
 >
 > - 单体架构：java web应用程序，包含表现层、业务层、数据访问层
@@ -10,6 +12,12 @@
 ![](images/20181122164025106.png)
 
 https://blog.csdn.net/weixin_40834464/article/details/88850523
+
+![](images/QQ截图20191217180009.png)
+
+![](images/QQ截图20191217180033.png)
+
+
 
 # spring-boot-actuator 
 
@@ -305,3 +313,97 @@ https://blog.csdn.net/weixin_40834464/article/details/88850523
   ```
 
   - 不能同时引入（Web Flux(Netty)跟Web MVC(Servlet)），找了好久找不到办法，所以旧代码得重写罗
+
+# spring cloud consul 
+
+> spring cloud eureka 2.0之后不再更新了。consul是一个springcloud中集成好的开源的分布式的服务注册发现中心。由Go预约编写。支持健康检查，多数据中心还支持K-V存储，采用RAFT一致性算法（RAFT算法使consul在有一半以上的节点注册成功时才证明服务注册成功），保证强一致性，可用性。并且和docker。并且和docker完美兼容。
+
+## springcloud Consul与springcloud Eureka的区别
+
+- Eureka 保证AP（可用性，容错性），consul保证CP（一致性，容错性）
+- consul 下载即可，和Eureka不同的是它不用使用idea启动
+
+
+
+## Zookeeper 、Eureka、consul 
+
+|      | Zookeeper | Eureka | consul | nacos |
+| ---- | --------- | ------ | ------ | ----- |
+| CAP  | CP        | AP     | CP     | CAP   |
+| 语言 | java      | java   | go     |       |
+|      |           |        |        |       |
+
+## consul使用 
+
+- 下载：https://www.consul.io/downloads.html 
+
+- windows：在解压路径下cmd-->./consul agent -dev -client 127.0.0.1 -ui
+
+  Linux：
+
+- 访问： http://localhost:8500/ui/dc1/services 
+
+- 注册：
+
+  - ```xml
+     <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+            </dependency>
+    ```
+
+  - 注意：
+
+    -  一个是版本号要对应，spring boot 2.1.x以上版本要使用Greenwich版本的spring cloud 不然无法兼容 
+    -  第二个是注册consul要有两个依赖，之前看了一个资料写只需要spring-cloud-starter-consul-discovery。其实是不行的 
+
+- yml配置
+
+  - ```yaml
+    spring: 
+        cloud:
+            consul:
+              host: 127.0.0.1 #consul的IP
+              port: 8500 #consul启动端口默认8500
+              discovery:
+                healthCheckPath: /actuator/health  #健康检查路径
+                healthCheckInterval: 15s #健康检查频率
+                hostname: 127.0.0.1 #注册服务所在IP
+                port: ${server.port}  #注册服务所在端口
+                service-name: ${spring.application.name} #注册服务名
+                register: true #是否启动注册
+                register-health-check: true #是否启动健康检查
+    
+    ```
+
+- 启动类加上注解： @EnableDiscoveryClient 
+
+## consul功能&特性
+
+## consul原理
+
+- 1.当 Producer 启动的时候，会向 Consul 发送一个 post 请求，告诉 Consul 自己的 IP 和 Port
+- 2.Consul 接收到 Producer 的注册后，每隔10s（默认）会向 Producer 发送一个健康检查的请求，检验Producer是否健康 
+- 3.当 Consumer 发送 GET 方式请求 /api/address 到 Producer 时，会先从 Consul 中拿到一个存储服务 IP 和 Port 的临时表，从表中拿到 Producer 的 IP 和 Port 后再发送 GET 方式请求 /api/address 
+- 4.该临时表每隔10s会更新，只包含有通过了健康检查的 Producer
+
+### 坑
+
+#### 单元测试时报错
+
+![](images/20190410223309422.png)
+
+-  https://blog.csdn.net/sinat_25484327/article/details/89197830 
+
+- ```java
+  @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+  //要不然${server.port}读不到
+  
+  ```
+
+- 
+
