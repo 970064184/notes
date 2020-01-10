@@ -327,11 +327,12 @@ https://blog.csdn.net/weixin_40834464/article/details/88850523
 
 ## Zookeeper 、Eureka、consul 
 
-|      | Zookeeper | Eureka | consul | nacos |
-| ---- | --------- | ------ | ------ | ----- |
-| CAP  | CP        | AP     | CP     | CAP   |
-| 语言 | java      | java   | go     |       |
-|      |           |        |        |       |
+|          | Zookeeper | Eureka | consul        | nacos |
+| -------- | --------- | ------ | ------------- | ----- |
+| CAP      | CP        | AP     | CP            | CAP   |
+| 语言     | java      | java   | go            |       |
+| 一致性   |           |        | raft          |       |
+| 使用语言 |           | HTTP   | 支持HTTP和dns |       |
 
 ## consul使用 
 
@@ -391,9 +392,9 @@ https://blog.csdn.net/weixin_40834464/article/details/88850523
 - 3.当 Consumer 发送 GET 方式请求 /api/address 到 Producer 时，会先从 Consul 中拿到一个存储服务 IP 和 Port 的临时表，从表中拿到 Producer 的 IP 和 Port 后再发送 GET 方式请求 /api/address 
 - 4.该临时表每隔10s会更新，只包含有通过了健康检查的 Producer
 
-### 坑
+## 坑
 
-#### 单元测试时报错
+### 单元测试时报错
 
 ![](images/20190410223309422.png)
 
@@ -407,3 +408,29 @@ https://blog.csdn.net/weixin_40834464/article/details/88850523
 
 - 
 
+## consule核心组件 
+
+### agent组件
+
+- 每个consul agent维护它自己的服务集合以及检查注册和健康信息。agent负责执行自己的健康检查和更新本地状态，agent根据节点的性质，分为agent server和agent client
+  - agent server：server保存client的注册信息，集群的配置信息，维护集群高可用，在局域网内与本地客户端通讯，通过广域网与其它数据中心通讯。每个数据中心的server数量推荐为3个或是5个，通过raft算法来保证一致性
+  - agent client：client将HTTP和DNS接口请求转发给局域网内的服务端集群
+
+### consul通信接口 
+
+- RPC：用于内部通讯Gossip/日志分发/选主等
+- HTTP API：服务发现/健康检查/KV存储等几乎所有功能，默认端口为8500
+- Consul Commands（CLI）：consul命令行工具可以与consulagent进行连接，提供部分consul的功能。实际上consul CLI默认就是调用HTTP API来与consul集群进行通讯。
+- DNS：仅用于服务查询
+
+### consul去中心化思想实现 
+
+### consul内部原理 
+
+![](images/20190620013719955.jpg)
+
+- 服务器server1、server2、server3上分别部署了consul server，组成了consule集群，通过raft选举算法，server2成为了leader节点
+- 服务器server4和server5上通过consul client分别注册serviceA、B、C（服务A、B、C注册到consul可以通过HTTP API（8500端口）的方式，也可以通过consul配置文件的方式）
+- consul client将注册信息通过RPC转发到consul server，服务信息保存在server的各个节点中，并且通过raft实现了强一致性。
+- 服务器server6中program D要访问serviceB，此时program D要先访问本机consul client提供的HTTP API，consul Client会将请求转发到consul server。consul server查询到service B并返回，最终program D拿到了service B的所有部署的IP和端口，根据负载均衡策略，选择service B的其中一个并向其发起请求。
+  - 如果服务发现采用的是DNS方式，则program D中使用service B的服务实现域名，域名解析请求首先到达本机DNS代理，然后转发到本机consul client，consul client会将请求转发到consul server。
