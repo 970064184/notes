@@ -1114,6 +1114,52 @@ SpringBoot：底层是Spring框架，Spring框架默认是用JCL；‘
 
 ​	**==SpringBoot选用 SLF4j和logback；==**
 
+- logback多环境的通用配置
+
+- ```xml
+  <!--方法一：命名为logback-spring.xml-->
+  <springProfile name="staging">
+  	<!-- configuration to be enabled when the "staging" profile is active -->
+  </springProfile>
+  
+  <springProfile name="dev | staging">
+  	<!-- configuration to be enabled when the "dev" or "staging" profiles are active -->
+  </springProfile>
+  
+  <springProfile name="!production">
+  	<property name="LOG_HOME" value="/mnt/log/dev/products"></property>
+  </springProfile>
+  ```
+
+- ```xml
+  <!--方法二：命名为logback-spring.xml-->
+  <springProperty scope="context" name="fluentHost" source="myapp.fluentd.host"
+  		defaultValue="localhost"/>
+  
+  <springProperty scope="context" name="logPath" source="logging.file.path" defaultValue="log/component-gateway-server" />
+  <!--yml-->
+  logging:
+    file:
+      path: /mnt/log/prod/products
+  ```
+
+
+
+#### 日志格式规范
+
+- ```java
+  //https://juejin.im/post/5e01a184e51d45581e44178a
+  // 正确示例，必须使用参数化信息的方式
+  log.debug("order is paying with userId:[{}] and orderId : [{}]",userId, orderId);
+  // 错误示例，不要进行字符串拼接,那样会产生很多 String 对象，占用空间，影响性能。及日志级别高于此级别也会进行字符串拼接逻辑。
+  log.debug("order is paying with userId: " + userId + " and orderId: " + orderId);
+  
+  ```
+
+- 
+
+
+
 
 
 ## 2、SLF4j使用
@@ -4163,7 +4209,23 @@ public class HelloServiceAutoConfiguration {
 
 https://github.com/spring-projects/spring-boot/tree/master/spring-boot-samples
 
+# springboot遇到的坑
 
+- 打包时如果用到测试： mvn install -DskipTests
+
+- @Data生成的set方法被我重写了，导致反序列化时出现类型不匹配问题
+
+- data为Object类型和T类型的区别：
+
+  原因是：接收feign调用时，不知道Object要转成什么，然后直接转成key=value 的形式，就会导致只要放一个对象，和那个key=value的key对的上，就能直接强制转换 
+
+- ![](C:/Users/admin/Desktop/学习相关笔记/nodes/乱七八糟/images/QQ截图20181114154020.png)
+
+- ![](C:/Users/admin/Desktop/学习相关笔记/nodes/乱七八糟/images/QQ截图20181114154102.png)
+
+- 
+
+- 
 
 
 

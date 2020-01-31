@@ -195,8 +195,15 @@ https://blog.csdn.net/zhangliao613/article/details/79021606
   - ls -lR /home |grep "^-" |wc -l：查看系统某个文件夹及子目录下的文件个数
 
     - ls -lR /home |grep "^d" |wc -l：查看系统某个文件夹及子目录下的目录个数
-
+- 
     
+
+- ll 
+
+  - ll -rt ：按时间排序
+    - -t：降序
+    - -t|tac 升序
+  - ll -Sh：按大小排序
 
 - cd：切换目录
 

@@ -135,3 +135,43 @@
 - notebook：笔记本
 - magazine：杂志
 - dictionary：词典
+
+# 专业语言
+
+- command：命令、控制
+- compile：编译、编辑
+- kit：工具箱
+- machine：机器
+- GC：垃圾收集机制
+- initialize：初始化
+- constant：常数
+- const：常量、常数
+- variable：变量、多变的
+- relational：相关的
+- operator：操作符
+- arithmetic：算术、算法
+- logic：逻辑的
+- assign：指派、分配
+- radius：半径
+- season：时期、季节、赛季
+- fall：下降、秋天
+- winter：冬季
+- width：宽度
+- upload：上传
+- positive：正的，确定的
+- negative：负的，否定的
+- half：一半、半场
+- round：圆、循环
+- reverse：反转、倒转
+- bubble sort：冒泡排序
+- binary search：二分查找
+- command parameter：命令行参数
+- initialize：初始化、设定初值
+- range：范围、幅度
+- confirm：确认、确定
+- stack：堆栈
+- heap：堆
+- oriented：导向的；定向的
+- circle：循环，周期，圆
+- rectangle：矩形、长方形
+- triangle：三角形

@@ -1,3 +1,5 @@
+> 
+>
 > 应用架构的发展：单体架构-->分布式架构-->SOA架构-->微服务架构
 >
 > - 单体架构：java web应用程序，包含表现层、业务层、数据访问层
@@ -10,6 +12,12 @@
 ![](images/20181122164025106.png)
 
 https://blog.csdn.net/weixin_40834464/article/details/88850523
+
+![](images/QQ截图20191217180009.png)
+
+![](images/QQ截图20191217180033.png)
+
+
 
 # spring-boot-actuator 
 
@@ -305,3 +313,124 @@ https://blog.csdn.net/weixin_40834464/article/details/88850523
   ```
 
   - 不能同时引入（Web Flux(Netty)跟Web MVC(Servlet)），找了好久找不到办法，所以旧代码得重写罗
+
+# spring cloud consul 
+
+> spring cloud eureka 2.0之后不再更新了。consul是一个springcloud中集成好的开源的分布式的服务注册发现中心。由Go预约编写。支持健康检查，多数据中心还支持K-V存储，采用RAFT一致性算法（RAFT算法使consul在有一半以上的节点注册成功时才证明服务注册成功），保证强一致性，可用性。并且和docker。并且和docker完美兼容。
+
+## springcloud Consul与springcloud Eureka的区别
+
+- Eureka 保证AP（可用性，容错性），consul保证CP（一致性，容错性）
+- consul 下载即可，和Eureka不同的是它不用使用idea启动
+
+
+
+## Zookeeper 、Eureka、consul 
+
+|          | Zookeeper | Eureka | consul        | nacos |
+| -------- | --------- | ------ | ------------- | ----- |
+| CAP      | CP        | AP     | CP            | CAP   |
+| 语言     | java      | java   | go            |       |
+| 一致性   |           |        | raft          |       |
+| 使用语言 |           | HTTP   | 支持HTTP和dns |       |
+
+## consul使用 
+
+- 下载：https://www.consul.io/downloads.html 
+
+- windows：在解压路径下cmd-->./consul agent -dev -client 127.0.0.1 -ui
+
+  Linux：
+
+- 访问： http://localhost:8500/ui/dc1/services 
+
+- 注册：
+
+  - ```xml
+     <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+            </dependency>
+    ```
+
+  - 注意：
+
+    -  一个是版本号要对应，spring boot 2.1.x以上版本要使用Greenwich版本的spring cloud 不然无法兼容 
+    -  第二个是注册consul要有两个依赖，之前看了一个资料写只需要spring-cloud-starter-consul-discovery。其实是不行的 
+
+- yml配置
+
+  - ```yaml
+    spring: 
+        cloud:
+            consul:
+              host: 127.0.0.1 #consul的IP
+              port: 8500 #consul启动端口默认8500
+              discovery:
+                healthCheckPath: /actuator/health  #健康检查路径
+                healthCheckInterval: 15s #健康检查频率
+                hostname: 127.0.0.1 #注册服务所在IP
+                port: ${server.port}  #注册服务所在端口
+                service-name: ${spring.application.name} #注册服务名
+                register: true #是否启动注册
+                register-health-check: true #是否启动健康检查
+    
+    ```
+
+- 启动类加上注解： @EnableDiscoveryClient 
+
+## consul功能&特性
+
+## consul原理
+
+- 1.当 Producer 启动的时候，会向 Consul 发送一个 post 请求，告诉 Consul 自己的 IP 和 Port
+- 2.Consul 接收到 Producer 的注册后，每隔10s（默认）会向 Producer 发送一个健康检查的请求，检验Producer是否健康 
+- 3.当 Consumer 发送 GET 方式请求 /api/address 到 Producer 时，会先从 Consul 中拿到一个存储服务 IP 和 Port 的临时表，从表中拿到 Producer 的 IP 和 Port 后再发送 GET 方式请求 /api/address 
+- 4.该临时表每隔10s会更新，只包含有通过了健康检查的 Producer
+
+## 坑
+
+### 单元测试时报错
+
+![](images/20190410223309422.png)
+
+-  https://blog.csdn.net/sinat_25484327/article/details/89197830 
+
+- ```java
+  @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+  //要不然${server.port}读不到
+  
+  ```
+
+- 
+
+## consule核心组件 
+
+### agent组件
+
+- 每个consul agent维护它自己的服务集合以及检查注册和健康信息。agent负责执行自己的健康检查和更新本地状态，agent根据节点的性质，分为agent server和agent client
+  - agent server：server保存client的注册信息，集群的配置信息，维护集群高可用，在局域网内与本地客户端通讯，通过广域网与其它数据中心通讯。每个数据中心的server数量推荐为3个或是5个，通过raft算法来保证一致性
+  - agent client：client将HTTP和DNS接口请求转发给局域网内的服务端集群
+
+### consul通信接口 
+
+- RPC：用于内部通讯Gossip/日志分发/选主等
+- HTTP API：服务发现/健康检查/KV存储等几乎所有功能，默认端口为8500
+- Consul Commands（CLI）：consul命令行工具可以与consulagent进行连接，提供部分consul的功能。实际上consul CLI默认就是调用HTTP API来与consul集群进行通讯。
+- DNS：仅用于服务查询
+
+### consul去中心化思想实现 
+
+### consul内部原理 
+
+![](images/20190620013719955.jpg)
+
+- 服务器server1、server2、server3上分别部署了consul server，组成了consule集群，通过raft选举算法，server2成为了leader节点
+- 服务器server4和server5上通过consul client分别注册serviceA、B、C（服务A、B、C注册到consul可以通过HTTP API（8500端口）的方式，也可以通过consul配置文件的方式）
+- consul client将注册信息通过RPC转发到consul server，服务信息保存在server的各个节点中，并且通过raft实现了强一致性。
+- 服务器server6中program D要访问serviceB，此时program D要先访问本机consul client提供的HTTP API，consul Client会将请求转发到consul server。consul server查询到service B并返回，最终program D拿到了service B的所有部署的IP和端口，根据负载均衡策略，选择service B的其中一个并向其发起请求。
+  - 如果服务发现采用的是DNS方式，则program D中使用service B的服务实现域名，域名解析请求首先到达本机DNS代理，然后转发到本机consul client，consul client会将请求转发到consul server。
