@@ -162,4 +162,16 @@
 - negative：负的，否定的
 - half：一半、半场
 - round：圆、循环
-- 
+- reverse：反转、倒转
+- bubble sort：冒泡排序
+- binary search：二分查找
+- command parameter：命令行参数
+- initialize：初始化、设定初值
+- range：范围、幅度
+- confirm：确认、确定
+- stack：堆栈
+- heap：堆
+- oriented：导向的；定向的
+- circle：循环，周期，圆
+- rectangle：矩形、长方形
+- triangle：三角形
