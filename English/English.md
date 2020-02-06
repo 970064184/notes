@@ -175,3 +175,6 @@
 - circle：循环，周期，圆
 - rectangle：矩形、长方形
 - triangle：三角形
+
+# 极简笔记
+
