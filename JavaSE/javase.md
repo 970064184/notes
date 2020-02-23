@@ -3196,7 +3196,7 @@ https://juejin.im/post/5b45ef49f265da0f5140489c#heading-4
 >   - 解决办法：
 >     - -Xms3062m
 >     - -Xmx3062m
->     - ![](C:/Users/admin/Desktop/%E5%AD%A6%E4%B9%A0%E7%9B%B8%E5%85%B3%E7%AC%94%E8%AE%B0/nodes/%E9%9D%A2%E8%AF%95%E9%A2%98/images/QQ%E6%88%AA%E5%9B%BE20190422173813.png)
+>     - ![](../%E9%9D%A2%E8%AF%95%E9%A2%98/images/QQ%E6%88%AA%E5%9B%BE20190422173813.png)
 >     - 
 > - 一个原因是程序中有死循环
 >   - 

@@ -175,6 +175,42 @@
 - circle：循环，周期，圆
 - rectangle：矩形、长方形
 - triangle：三角形
+- modifier：修饰语，修饰符
+- variable：变量
+- reference：引用，参考
+- statement：语句
+- declare：声明
+- method invocation：方法调用
+- calling method：调用方法
+- definition：定义
+- withdraw：撤退，收回，撤销
+- balance：平衡，余额
+- identity：身份，一致
+- identifier：标识符
+- encapsulation：封装、包装
+- margin：边缘、利润、页边的空白
+- pass by reference：按引用传递
+- pass by value：按值传递
+- inherit：继承、遗传而得
+- modify：修改、更改
+- confirm：确认、确定
+- hire：雇用、租用
+- bonus：奖金、红利、额外津贴
+- stock：股份、股票
+- report：报道、报告、成绩单
+- casting：转型
+- upcasting：向上转型
+- downcasting：向下转型
+- ClassCastException：类型转换异常
+- composite：复合、组合
+- association：关联
+- aggregation：聚合
+- generalization：概况，普遍化，一般化
+- dependency：依赖
+- polymorphism：多态性，多形性
+- block：大块的，交通堵塞的
+- vehicle：车辆、工具
+- truck：卡车
 
 # 极简笔记
 

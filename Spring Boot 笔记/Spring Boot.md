@@ -4219,9 +4219,9 @@ https://github.com/spring-projects/spring-boot/tree/master/spring-boot-samples
 
   原因是：接收feign调用时，不知道Object要转成什么，然后直接转成key=value 的形式，就会导致只要放一个对象，和那个key=value的key对的上，就能直接强制转换 
 
-- ![](C:/Users/admin/Desktop/学习相关笔记/nodes/乱七八糟/images/QQ截图20181114154020.png)
+- ![](../乱七八糟/images/QQ截图20181114154020.png)
 
-- ![](C:/Users/admin/Desktop/学习相关笔记/nodes/乱七八糟/images/QQ截图20181114154102.png)
+- ![](../乱七八糟/images/QQ截图20181114154102.png)
 
 - 
 
