@@ -185,7 +185,7 @@
   - BeanFactory
   - ApplicationContext
 - BeanFactory可以理解为就是个HashMap，key是BeanName，value是Bean实例。通常只提供注册（put），获取（get）这两个功能。（低级容器）
-- ApplicationContext（高级容器）比BeanFactory多了更多功能。它继承了多个接口。盖接口定义了一个refresh方法，用于刷新整个容器，即重新加载/刷新所有的bean，代表着整个大容器的所有功能。
+- ApplicationContext（高级容器）比BeanFactory多了更多功能。它继承了多个接口。该接口定义了一个refresh方法，用于刷新整个容器，即重新加载/刷新所有的bean，代表着整个大容器的所有功能。
 
 > 添加bean的几种方式：
 >
@@ -236,7 +236,7 @@
 > ```java
 > bean 赋值，注入其他组件，@Autowired，生命周期注解功能，@Async，xxx BeanPostProcessor;
 > AutowiredAnnotationBeanPostProcessor     
->  
+> 
 > ```
 >
 > - > 1）返回值：不要返回值直接void；需要返回值用AsyncResult或者CompletableFuture
@@ -277,38 +277,40 @@
 >   - 自动装配默认一定要将属性赋值好，没有就会报错，可以使用@Autowired(required=false)
 >
 >   - ```java
->     @Autowired
->     private BookDao bookDao;
->   ```
->   ```
+>      @Autowired
+>       private BookDao bookDao;
+>      ```
+> ```
 > 
->   ```
+> ```
 >
+> ```
+> 
 > @Autowired
 > private BookDao（类型） bookDao2(属性名);
 > ​```java
->
+> 
 >   - 
->
+> 
 > - @Primary：让spring进行自动装配的时候，默认使用首选bean
->
+> 
 > - @Resource @Inject
->
+> 
 > - @Resource 默认是按照组件名称进行装配的（没能支持@Primary功能，没有支持@Autowired(required=false)）
->
+> 
 > - @Inject：自动装入和Autowired功能意义，没有required=false功能
->
+> 
 >   - 需要导入依赖：javax.inject
->
+> 
 > - 自定义组件想要使用spring容器底层的一些组件（ApplicationContext、BeanFactory，xxx）；
->
+> 
 >   - 自定义组件实现xxxAware：在创建对象的时候，会调用接口规定的方法注入相关组件：Aware
 >   - 把spring底层一些组件注入到自定义的bean中，xxxAware：功能使用xxxProcessor（ApplicationContextAware-->ApplicationContextAwareProcessor）
->
+> 
 > - @Profile：spring为我们提供的可以根据当前环境，动态的激活和切换一系列组件的功能，不指定，任何环境下都能注册这个组件
->
+> 
 >   - 加了环境标识的bean，只有在这个环境被激活的时候才能注册到容器中，默认是default环境
->
+> 
 >   - > spring如何切换环境？
 >  >
 >     > - 使用命令行动态参数：-Dspring.profiles.active=test
@@ -317,10 +319,10 @@
 >     >   - 设置需要激活的环境
 >     >   - 注册主配置类
 >     >   - 启动刷新容器
->
+> 
 >   - 写在配置类上，只有是指定的环境的时候，整个配置类里面的所有配置才能
->
-> ```java
+> 
+> ​```java
 > populateBean(...);//给bean进行属性赋值
 > initializationBean{
 > applyBeanPostProcessorBeforeInitialization(...);
@@ -328,22 +330,22 @@
 > applyBeanPostProcessorsAfterInitialization(...);
 > }
 > ```
-> 
+>
 >     - spring底层对BeanPostProcessor的使用
-> 
-> ​```java
+>
+> ```java
 > bean 赋值，注入其他组件，@Autowired，生命周期注解功能，@Async，xxx BeanPostProcessor;
 > AutowiredAnnotationBeanPostProcessor
-> 
-> 
+>
+>
 > ```
->
+> 
 > 属性赋值：
->
+> 
 > - 使用@Value赋值
->
+> 
 > AOP：【动态代理】
->
+> 
 > - 指在程序运行期间动态的将某段代码切入到指定方法指定位置进行运行的编程方式。
 > - @Aspect：告诉spring哪个类是切面类
 >   - 给配置类中加@EnableAspectJAutoPrxoy：开启基于注解的aop模式
@@ -371,6 +373,7 @@
 >         - 正常执行：前置通知-->目标方法-->后置通知-->返回通知
 >         - 异常执行：前置通知-->目标方法-->后置通知-->异常通知
 >     - 
+> ```
 
 流程：
 

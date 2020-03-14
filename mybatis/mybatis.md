@@ -69,3 +69,12 @@
 
 - **mybatis-plus版本降至3.1.0或以下即可**
 
+
+
+
+
+# mybatis中的#和$的区别
+
+- >  将传入的数据都当成一个字符串，会对自动传入的数据加一个双引号。如：order by #user_id#，如果传入的值是111,那么解析成sql时的值为order by "111", 如果传入的值是id，则解析成的sql为order by "id"
+
+- > $将传入的数据直接显示生成在sql中。如：order by $user_id$，如果传入的值是111,那么解析成sql时的值为order by user_id, 如果传入的值是id，则解析成的sql为order by id

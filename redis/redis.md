@@ -1383,3 +1383,12 @@ https://blog.csdn.net/qq_34337272/article/details/80012284
   - redis -benchmard -n 1000000 -q
 
     (同时执行100万的请求)
+
+# redis 如何利用多核CPU机器的性能 （关于redis是单线程，所以6核以上的机器部署redis是中浪费cpu的说法的思考）
+
+> 首先看CPU频率，如果CPU频率低，并且访问redis的并发很大，那么大个redis线程分摊到每个CPU上的压力也是非常可观的（一个线程并不是一直都bind到一个固定的核上面的）
+
+- redis的读取和处理性能非常强大，一般服务器的cpu都不会是性能瓶颈。redis的性能瓶颈主要集中在内存和网络方面。所以，如果使用的redis命令多为O(N)、O(log(N))时间复杂度，那么基本上不会出现cpu瓶颈的情况。
+  但是如果你确实需要充分使用多核cpu的能力，那么需要在单台服务器上运行多个redis实例(主从部署/集群化部署)，并将每个redis实例和cpu内核进行绑定(使用 taskset命令，百度：<https://www.baidu.com/s?wd=taskset&tn=84053098_3_dg&ie=utf-8>)。
+  如果需要进行集群化部署，你需要对redis进行分片存储，可以参考<https://redis.io/topics/partitioning>
+
