@@ -1309,8 +1309,12 @@ http://blog.51cto.com/13961945/2174326（面试题）
     - 使用布隆过滤器崩
 
 - 缓存雪崩：指缓存服务器重启或者大量缓存集中在某一个时间段失效
+
+  - <https://blog.csdn.net/qq_35190492/article/details/102889333?depth_1-utm_source=distribute.pc_relevant.none-task&utm_source=distribute.pc_relevant.none-task> 
+
   - 解决方案：
     - 对不同的数据使用不同的失效时间，甚至对相同的数据、不同的请求使用不同的失效时间
+
 - https://juejin.im/post/5ca8905ef265da30ba5b18bc
 
 - mysql里有2000W数据，redis只存20W数据，如何保证redis中的数据都是热点数据

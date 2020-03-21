@@ -22,6 +22,25 @@
 - netty主要针对在TCP协议下，面向clients端的高并发应用，或者peer-to-peer场景下的大量数据持续传输的应用。
 - netty本质是一个NIO框架，适用于服务器通讯相关的多种应用场景：dubbo、rocketmq
 
+## Netty的优势有哪些
+
+- 使用简单：封装了NIO的很多细节，使用更简单
+- 功能强大：预置了多种编解码功能，支持多种主流协议
+- 定制能力强：可以通过ChannelHandler对通信框架进行灵活地扩展
+- 性能高：Netty综合性能最优
+- 稳定：Netty修复了已经发现的所有NIO的bug，让开发人员可专注于业务本身
+- 社区活跃：Netty是活跃的开源项目，版本迭代周期短，bug修复速度快
+
+## Netty高性能表现在哪些方面
+
+- IO线程模型：同步非阻塞，用最少的资源做更多的事
+- 内存零拷贝：尽量减少不必要的内存拷贝，实现了更高效率的传输
+- 内存池设计：申请的内存可以重用，主要指直接内存。内部实现是用一颗二叉树查找树管理内存分配情况
+- 串行化处理读写：避免使用锁带来的性能开销
+- 高性能序列化协议：支持Protobuf等高性能序列化协议
+
+<https://blog.csdn.net/ThinkWon/article/details/104391081?depth_1-utm_source=distribute.pc_relevant.none-task&utm_source=distribute.pc_relevant.none-task> 
+
 ## 线程模型
 
 > 目前存在的线程模型有：传统阻塞I/O服务模型、Reactor模式（反应器模式）（单Reactor单线程、单Reactor多线程、主从Reactor多线程）、
@@ -210,11 +229,26 @@
 
 ## Netty 启动过程源码剖析
 
+### Netty执行过程
+
+- 创建ServerBootstrap实例
+- 设置并绑定Reactor线程池：EventLoopGroup ，EventLoop就是处理所有注册到本线程的Selector上面的Channel
+- 设置并绑定服务端的channel
+- 创建处理网络事件的ChannelPipeline和Handler，网络时间以流的形式在其中流转，Handler完成多数的功能定制：比如编解码SSL安全认证
+- 绑定并启动监听端口
+- 当轮询到准备就绪的channel后，由Reactor线程：NioEventLoop执行pipline中的方法，最终调度并执行channelHandler
+
 ## RPC调用流程 
 
 ![](images/QQ截图20200310202830.png)
 
 
+
+## Netty对象池
+
+<https://www.jianshu.com/p/3bfe0de2b022>
+
+- > 对象池其实就是缓存一些对象从而避免大量创建同一个类型的对象，同时限制了实例的个数。类似线程池的概念。池化技术最终要的就是重复的使用池内已经创建的对象。
 
 # BIO
 
@@ -280,6 +314,8 @@
 - 零拷贝，是从操作系统的角度来说，因为内核缓冲区之间，没有数据是重复的（只有kernel buffer有一份数据）
 - 零拷贝不仅带来更少的数据复制，还能带来其他的性能优势，例如更少的上下文切换，更少的CPU缓存伪共享以及无CPU校验和计算
 
+
+
 # AIO 
 
 - 异步非阻塞：AIO引入异步通道的概念，采用了Proactor模式，简化了程序编写，有效的请求才启动线程，它的特点是先由操作系统完成后才通知服务端程序启动线程去处理，一般适用于连接数较多且连接时间较长的应用。
@@ -324,6 +360,8 @@
 | 数据大小限制 | IO流无限制           | 数据包不能超过64k  |
 | 传输效率     | 占用资源大，传输慢   | 占用资源少，传输快 |
 | 应用案例     | FTP/SMTP传文件       | QQ聊天、飞秋聊天   |
+
+<https://www.cnblogs.com/xiaoyangjia/p/11526197.html>
 
 ### TCP 
 
