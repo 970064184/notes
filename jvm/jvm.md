@@ -417,4 +417,16 @@ jstack pid |grep '0xtid' -C5 --color
 ## CPU飙升、内存不足解决办法
 
 - 限制每个进程的内存大小、CPU使用率（cpulimit）(docker 可在启动时-m 带参数)
-- 
+
+### 排除步骤
+
+- 先用top命令找出CPU占比最高的
+- ps -ef或者jps进一步定位，得知是一个怎么样的一个后台程序
+- 定位到具体线程或者代码
+  - ps -mp 进程 -o THREAD,tid,time
+  - -m：显示所有的线程
+  - -p pid 进程使用CPU的时间
+  - -o 该参数后是用户自定义格式
+- 将需要的线程ID转换为16进制格式
+  - printf "%x\n" 有问题的线程ID
+- jstack 进程ID |grep tid（16进制线程ID小写英文）-A60

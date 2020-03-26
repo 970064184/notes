@@ -272,4 +272,8 @@ rename WO_USER_INFO_NE to wo_user_info;
 
 ```
 
-### 
+
+
+# oracle修改表字段默认值
+
+alter table 表名 modify 字段名 default 默认值;

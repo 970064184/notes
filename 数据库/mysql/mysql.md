@@ -625,3 +625,95 @@ EXPLAIN select * from employees where age > 1 and age <= 2000;
 例如， 帖子表中只能出现发帖人的 id， 而不能出现发帖人的 id， 还同时出现发帖人姓名，
 否则， 只要出现同一发帖人 id 的所有记录， 它们中的姓名部分都必须严格保持一致， 这就
 是数据冗余。
+
+# 获取当前时间函数
+
+**1** 获得当前日期+时间（date + time）函数：now()
+
+ 
+
+ 
+
+**2** 获得当前日期+时间（date + time）函数：sysdate()
+
+sysdate() 日期时间函数跟 now() 类似，不同之处在于：now() 在执行开始时值就得到了， sysdate() 在函数执行时动态得到值。
+
+ 
+
+ 
+
+**3** 获得当前日期（date）函数：curdate()
+
+等同于：current_date(),current_date
+
+ 
+
+ 
+
+**4**获得当前时间（time）函数：curtime()
+
+等同于：current_time(),current_time
+
+ 
+
+ 
+
+**5** 获得当前 UTC 日期时间函数：utc_date(), utc_time(), utc_timestamp()
+
+因为我国位于东八时区，所以本地时间 = UTC 时间 + 8 小时。
+
+
+
+6 DATEDIFF ( datepart , startdate , enddate )释义：计算时间差；(DATEDIFF(date1,date2) 函数返回两个日期之间的天数。)
+datepare值：year | quarter | month | week | day | hour | minute | second | millisecond
+startdate：开始日期
+enddate ：结束日期
+getDate()：获取当前的系统日期
+
+# select into from 与 insert into select用法详解
+
+
+select into from 和 insert into select都被用来复制表结构和表中数据，
+两者的主要区别为：
+select into from 要求目标表不存在，因为在插入时会自动创建。
+insert into select from 要求目标表已存在数据库中。
+
+一、INSERT INTO SELECT语句
+
+
+1、语句形式为：
+
+Insert into Table2(field1,field2,...) select value1,value2,... from Table1;
+
+
+2、注意点：
+
+（1）要求目标表Table2必须存在，并且要复制的字段field,field2...也必须存在
+
+（2）注意Table2的主键约束，如果Table2有主键且不为空，则 field1， field2...中必须包括主键
+
+（3）注意区分 Insert into Table2(field1,field2,...) values (select value1,value2,... from Table1)；
+
+
+二、SELECT INTO FROM语句
+
+1、语句形式为：
+SELECT vale1,value2 into Table2 from Table1;
+
+ 2、注意点：
+要求目标表Table2不存在，因为在插入时会自动创建表Table2，并将Table1中指定字段数据复制到Table2中 。
+
+3、应用实例：
+SELECT name as iName, 0 as iAge,phone as iPhone
+INTO table2
+FROM table1;
+上面的例子:将会复制表1的结构，而且会把name字段改成iName,phone字段改成IPhone并添加IAge字段(0对应int类型)到新表table2中，对于复制表结构的同时需要增加新的列并插入数据的情形很可以用此语句。
+
+# mysql 修改表字段默认值
+
+```sql
+alter table 表名 alter column 字段名 drop default; (若本身存在默认值，则先删除)
+
+alter table 表名 alter column 字段名 set default 默认值;(若本身不存在则可以直接设定)
+```
+
