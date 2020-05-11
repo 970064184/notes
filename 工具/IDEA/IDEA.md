@@ -134,6 +134,16 @@ $param$
 
 ![](images/20190919135641281.png)
 
+## 统一编码
+
+```java
+File->Settings->Editor->File Encodings
+```
+
+![](images/QQ截图20200427195531.png)
+
+
+
 # 安装的插件
 
 - 阿里巴巴代码规范：Alibaba java coding guidelines 
@@ -163,3 +173,5 @@ $param$
 - <https://mp.weixin.qq.com/s/zyIKY0Bc7DXic7kQN-zuRA>
 
 - **Free Mybatis plugin -Mybatis 辅助插件**
+
+- maven help：解决jar冲突

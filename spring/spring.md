@@ -277,9 +277,13 @@
 >   - 自动装配默认一定要将属性赋值好，没有就会报错，可以使用@Autowired(required=false)
 >
 >   - ```java
->      @Autowired
->       private BookDao bookDao;
->      ```
+>        @Autowired
+>        private BookDao bookDao;
+>        ```
+>    ```
+> 
+>    ```
+>
 > ```
 > 
 > ```
@@ -373,6 +377,10 @@
 >         - 正常执行：前置通知-->目标方法-->后置通知-->返回通知
 >         - 异常执行：前置通知-->目标方法-->后置通知-->异常通知
 >     - 
+> ```
+>
+> ```
+> 
 > ```
 
 流程：
@@ -677,6 +685,36 @@
 
 ![](images/20190410193229168.png)
 
+### 事务失效的几种情况
+
+#### 数据库引擎不支持事务 
+
+- mysql的myisam引擎不支持事务操作，innodb才支持事务。从mysql5.5.5开始默认存储引擎是innodb，之前默认都是myisam
+
+#### 没有被spring管理
+
+- 因为事务使用的是代理类植入。如@Service注解被注释掉，则该bean不会被spring管理
+
+#### 方法表示public的
+
+- @Transaction只能用于public的方法上，否则会失效。若要用在非public的方法上，可以开启Aspect代理模式
+
+#### 自调用问题
+
+- 调用该类自己的方法，而没有经过spring的代理类，默认只有在外部调用事务才会生效。解决方案之一是在类中注入自己，用注入的对象再调用另外一个方法。另一个方案如下：
+
+  ​     使用两个服务类(被调用的方法也定义到一个service类里)，从ioc容器中直接获取该服务的代理对象
+
+#### 数据源没有配置事务管理器 
+
+#### 事务的扩展上不支持事务
+
+- 如Propagation.NOT_SUPPORTED 。回滚异常没有，无法回滚
+
+#### 异常类型错误 
+
+- 默认回滚的是RuntimeException，如果想触发其它异常回滚，需要在注解上配置一下(rollbackFor  = Exception.class)
+
 # spring应用相关 
 
 ![](images/16a53b4751322644.png)
@@ -932,3 +970,10 @@ String condition() default ""; //条件符合则清空
 
 # spring循环依赖及解决方式 
 
+# 坑
+
+## spring中不同包中类名相同报错处理
+
+- bean的id命名遵循：一般情况下，将类名的首字母改为小写，作为bean的id。**如com.java.String类对应的bean的id为"string";**
+  - 特殊情况下，即类名超过2个字符，且前两个字符均大写，则直接用类名作为bean的id。如：**com.chenchenchen.URL类对应的bean的id为"URL";**
+- 所以可以将同名的其中一个的注解的name属性改为其他值，例如：@Component(value =“othername”)

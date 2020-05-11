@@ -1368,12 +1368,12 @@ https://blog.csdn.net/qq_34337272/article/details/80012284
   - 如，七夕过节热搜词
 
 - 会话缓存（session cache）
-- 消息队列
+- 消息队列，微信消息和微信公众号消息
   - 排行榜：list：lpush、rpush
 - 发布、订阅消息（消息通知）
-- 商品列表、评论列表
+- 商品列表、评论列表、电商购物车
   - hash：hset、hget：存储对象
-- 共同关注、共同喜欢
+- 共同关注、共同喜欢、微信抽奖小程序、微信微博点赞收藏、
   - set：sadd（自动排重）
 - 在直播系统中，实时排行信息包含直播间在线用户列表，各种礼物排行榜，弹幕消息（可以理解为按消息纬度的消息排行榜）
   - zset：zadd
@@ -1395,4 +1395,43 @@ https://blog.csdn.net/qq_34337272/article/details/80012284
 - redis的读取和处理性能非常强大，一般服务器的cpu都不会是性能瓶颈。redis的性能瓶颈主要集中在内存和网络方面。所以，如果使用的redis命令多为O(N)、O(log(N))时间复杂度，那么基本上不会出现cpu瓶颈的情况。
   但是如果你确实需要充分使用多核cpu的能力，那么需要在单台服务器上运行多个redis实例(主从部署/集群化部署)，并将每个redis实例和cpu内核进行绑定(使用 taskset命令，百度：<https://www.baidu.com/s?wd=taskset&tn=84053098_3_dg&ie=utf-8>)。
   如果需要进行集群化部署，你需要对redis进行分片存储，可以参考<https://redis.io/topics/partitioning>
+
+# redis分布式锁
+
+## 分布式锁场景
+
+- 互联网秒杀
+- 抢优惠券
+- 接口幂等性校验
+
+## redisson 
+
+![](images/QQ截图20200420175940.png)
+
+```java
+ String lockKey ="lockKey_" + RightLimitUtils.EQUITYSTORECENTER_RIGHTLIMIT_RIGHTDAYACTIVATESUM.replace("${rightId}",request.getData().getEquityUserId());
+        RLock lock = redissonClient.getLock(lockKey);
+        try {
+            lock.lock();
+            Object o = redisTemplate.opsForValue().get(RightLimitUtils.EQUITYSTORECENTER_RIGHTLIMIT_RIGHTDAYACTIVATESUM.replace("${rightId}", request.getData().getEquityUserId()));
+
+            int result = o == null ? 0 : Integer.parseInt(o.toString());
+            if(result > 0 ){
+                int realResult = result -1 ;
+                redisTemplate.opsForValue().set(RightLimitUtils.EQUITYSTORECENTER_RIGHTLIMIT_RIGHTDAYACTIVATESUM.replace("${rightId}", request.getData().getEquityUserId()),realResult+"");
+                System.out.println("扣减成功，剩余库存："+realResult);
+
+            }else {
+                System.out.println("扣减失败，库存不足");
+            }
+        }finally {
+            if(lock.isLocked()){
+                lock.unlock();
+            }
+        }
+```
+
+### 将分布式锁提高性能100倍的方法
+
+- redlock
 

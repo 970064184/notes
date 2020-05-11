@@ -1963,6 +1963,8 @@ public class ConcurrencyTest {
   - 子类通过继承并通过实现它的方法管理其状态（acquire和release）的方法操纵状态
   - 可以同时实现排它锁和共享锁模式（独占、共享）
 - AQS同步组件
+- ![](images/QQ截图20200429163742.png)
+- 
   - CountDownLatch
     - 计数器必锁
   - Semaphore
@@ -2283,14 +2285,20 @@ public class ConcurrencyTest {
 
 - char < short <int <float <double不同类型运算结果类型向右边靠齐
 
+## 引用类型 
 
+- 类（String）
+- 接口
+- 数组
 
 ## 数据类型转换 
 
 ### 自动类型转换
 
 - 从存储范围小的类型到存储范围大的类型
-  - byte→short(char)→int→long→float→double
+  - byte、short、char→int→long→float→double
+- 整型常量，默认类型为int型
+- 浮点型常量，默认类型为double型
 
 ### 强制类型转换
 
@@ -2341,10 +2349,12 @@ public class ConcurrencyTest {
 - &：两个表达式都会执行
 
   - 可作位运算符，当&两边的表达式不是Boolean类型时，&表示按位操作
+  - ![](images/QQ截图20200501150544.png)
+  - 
 
 - ```java
   int x = 1,y = 1;
-
+  
   if(x++==2 & ++y==2) {
   x =7;
   }
@@ -2354,7 +2364,7 @@ public class ConcurrencyTest {
 
 - ```java
   int x = 1,y = 1;
-
+  
   if(x++==2 && ++y==2)
   {
   x =7;
@@ -2446,10 +2456,31 @@ public class ConcurrencyTest {
 
 - 例如 3+-4，则意义为 3 加-4
 
+## for
+
+![](images/QQ截图20200504191911.png)
+
+## while 
+
+![](images/QQ截图20200504194751.png)
+
+## do while
+
+![](images/QQ截图20200504200920.png)
+
+## 嵌套循环 
+
+![](images/QQ截图20200504201834.png)
+
+
+
 ## break 和continue 
 
 - break：语句的功能时结束所在的循环
 - continue：跳过当次循环未执行的代码，直接执行下一次循环
+- ![](images/QQ截图20200506151706.png)
+- ![](images/QQ截图20200506155255.png)
+- 
 
 ## 内部类 
 
