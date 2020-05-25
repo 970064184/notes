@@ -799,6 +799,20 @@ java -jar spring-boot-02-config-02-0.0.1-SNAPSHOT.jar --server.port=8087  --serv
 
 [参考官方文档](https://docs.spring.io/spring-boot/docs/1.5.9.RELEASE/reference/htmlsingle/#boot-features-external-config)
 
+### 引用外部yml配置文件
+
+<https://blog.csdn.net/qq_36174487/article/details/89419347>
+
+-  ```yml
+  #创建application-common.yml 文件,include:common common 是application-后缀，此方式必须是application开头yml文件
+  spring:
+    profiles:
+      active: @spring.profiles.active@
+      include: common
+   ```
+
+- 
+
 ## 8、自动配置原理
 
 配置文件到底能写什么？怎么写？自动配置原理；
@@ -1385,6 +1399,84 @@ logback.xml：直接就被日志框架识别了；
 如果使用logback.xml作为日志配置文件，还要使用profile功能，会有以下错误
 
  `no applicable action for [springProfile]`
+
+### logback.xml导入(include)其他项目配置的logback.xml文件
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<included>
+	<springProperty scope="context" name="logLevel" source="logging.level"/>
+	<!-- 彩色日志依赖的渲染类 -->
+	<conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+	<conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
+	<conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
+	<!-- 彩色日志格式 -->
+	<property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%clr(%d{MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}.%line){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}" />
+	<property name="pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } --- [%t] %-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+	<property name="logs.path" value="log/em-auth-server" />
+	<!-- 全局debug会输出过多的信息，不易于排查问题，启动项目也慢，所以将
+		sql打印，nosql打印，消息队列打印信息这种重要信息抽取为在全局INFO的情况下，
+		可以随意配置日志打印级别，方便开发使用 -->
+	<property name="message.level" value="${logLevel}" />
+	<appender name="consoleLog" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
+			<charset>utf8</charset>
+		</encoder>
+	</appender>
+	<appender name="fileInfoLog"
+			  class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+		<file>${logs.path}.log</file>
+		<append>true</append>
+		<!--滚动策略 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!--路径 -->
+			<fileNamePattern>${logs.path}.%d.log</fileNamePattern>
+			<maxHistory>7</maxHistory>
+			<cleanHistoryOnStart>true</cleanHistoryOnStart>
+		</rollingPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<pattern>${pattern}</pattern>
+		</encoder>
+	</appender>
+	<appender name="fileErrorLog"
+			  class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>ERROR</level>
+		</filter>
+		<file>${logs.path}.error.log</file>
+		<append>true</append>
+		<!--滚动策略 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!--路径 -->
+			<fileNamePattern>${logs.path}.error.%d.log</fileNamePattern>
+			<maxHistory>7</maxHistory>
+			<cleanHistoryOnStart>true</cleanHistoryOnStart>
+		</rollingPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<pattern>${pattern}</pattern>
+		</encoder>
+	</appender>
+
+
+	<root level="info">
+		<appender-ref ref="consoleLog" />
+		<appender-ref ref="fileInfoLog" />
+		<appender-ref ref="fileErrorLog" />
+	</root>
+
+</included>
+```
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+	<include resource="logback-base.xml"/>
+</configuration>
+```
+
+
 
 ## 5、切换日志框架
 

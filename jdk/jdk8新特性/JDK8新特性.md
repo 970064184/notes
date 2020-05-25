@@ -360,6 +360,18 @@ Stream的terminal的操作有：
 
 forEach、forEachOrdered、toArray、reduce、collect、min、max、count、anyMacth、allMatch、noneMatch、findFirst、findAny、iterator
 
+### Stream数据流效率分析？
+
+<https://blog.csdn.net/Al_assad/article/details/82356606>
+
+- 在少低数据量的处理场景中（size<=1000）,stream 的处理效率是不如传统的iterator外部迭代器处理速度快的，但实际上这些处理任务本身运行时间都低于毫秒，这点效率的差距对普通业务几乎没有影响，反而stream可使得代码更加简洁。
+- 在大数据量（size>10000）时，stream的处理效率会高于iterator,特别是使用了并行流，在CPU恰好将线程分配到多个核心的条件下（当然parallel stream底层使用的是jvm的forkjoinpool，这东西分配线程本身就很玄学）可以达到一个很高的运行效率，然而实际普通业务一般不会有需要迭代高于10000次的计算；
+  - parallel stream受CPU环境影响很大，当没分配到多个CPU核心时，加上引用forkjoinpool的开销，运行效率可能还不如普通的stream
+- 使用stream的建议：
+  - 简单的迭代逻辑，可以直接使用iterator，对于有多步处理的迭代逻辑，可以使用stream，损失一点几乎没的效率，换来代码的高可读性是值得的
+  - 单核CPU环境，不建议使用parallel stream，在多核CPU且有大数据量的条件下，推荐使用parallel stream
+  - stream中含有装箱类型，在进行中间操作之前，最好转成对应的数值流，减少由于频繁的拆箱、装箱造成的性能损失
+
 ## Lambda表达式
 
 ```java

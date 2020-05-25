@@ -35,6 +35,10 @@
 
 https://blog.csdn.net/zhangliao613/article/details/79021606
 
+## 返回上一次所在目录
+
+- cd -
+
 ## 系统 
 
 - 关机与重启
@@ -196,7 +200,6 @@ https://blog.csdn.net/zhangliao613/article/details/79021606
 
     - ls -lR /home |grep "^d" |wc -l：查看系统某个文件夹及子目录下的目录个数
 - 
-    
 
 - ll 
 
