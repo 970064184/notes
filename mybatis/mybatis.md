@@ -63,6 +63,18 @@
   > - 内置性能分析插件：可输出SQL语句及其执行时间，建议开发测试时启用该功能，能快速揪出慢查询
   > - 内置全局拦截插件：提供全部delete、update操作智能分析阻断，也可自定义拦截规则，预防误操作
 
+# SQL日志打印
+
+```yaml
+#SQL日志打印
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+```
+
+
+
 # 坑
 
 ## mybatis-plus使用jdk8的LocalDateTime 查询时报错

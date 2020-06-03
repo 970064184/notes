@@ -442,6 +442,23 @@ while (!atomicReference.compareAndSet(null, thread)) { }
 4. **是否为公平锁**：`sync`只能是非公平锁，而`Lock`既能是公平锁，又能是非公平锁。
 5. **绑定多个条件**：`sync`不能，只能随机唤醒。而`Lock`可以通过`Condition`来绑定多个条件，精确唤醒。
 
+## synchronized的特性
+
+### 可重入特性
+
+- synchronized的锁对象中有一个计数器（recursion变量）会记录线程获得几次锁，在执行完同步代码块时，计数器的数量会-1，直到计数器的数量为0，就释放这个锁
+- 好处
+  - 可避免死锁
+  - 可更好封装代码
+
+![](images/QQ截图20200522151720.png)
+
+
+
+### 不可中断特性
+
+- 
+
 # CountDownLatch/CyclicBarrier/Semaphore
 
 ## CountDownLatch

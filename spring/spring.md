@@ -2,6 +2,8 @@
 
 ## 启动流程
 
+<https://www.jianshu.com/p/5489e25744a9>
+
 （spring的启动过程其实就是其IOC容器的启动过程，对于web程序，IOC容器启动过程即是建立上下文的过程 https://juejin.im/post/5a38be61f265da431c706d2d#heading-3 ）
 
 > Spring容器的refresh()【创建刷新】;
@@ -277,12 +279,12 @@
 >   - 自动装配默认一定要将属性赋值好，没有就会报错，可以使用@Autowired(required=false)
 >
 >   - ```java
->        @Autowired
->        private BookDao bookDao;
->        ```
->    ```
+>     @Autowired
+>     private BookDao bookDao;
+>     ```
+> ```
 > 
->    ```
+> ```
 >
 > ```
 > 
@@ -340,16 +342,16 @@
 > ```java
 > bean 赋值，注入其他组件，@Autowired，生命周期注解功能，@Async，xxx BeanPostProcessor;
 > AutowiredAnnotationBeanPostProcessor
->
->
+> 
+> 
 > ```
-> 
+>
 > 属性赋值：
-> 
+>
 > - 使用@Value赋值
-> 
+>
 > AOP：【动态代理】
-> 
+>
 > - 指在程序运行期间动态的将某段代码切入到指定方法指定位置进行运行的编程方式。
 > - @Aspect：告诉spring哪个类是切面类
 >   - 给配置类中加@EnableAspectJAutoPrxoy：开启基于注解的aop模式
@@ -377,6 +379,8 @@
 >         - 正常执行：前置通知-->目标方法-->后置通知-->返回通知
 >         - 异常执行：前置通知-->目标方法-->后置通知-->异常通知
 >     - 
+> ```
+> 
 > ```
 >
 > ```
