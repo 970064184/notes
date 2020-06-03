@@ -1435,6 +1435,185 @@ https://blog.csdn.net/qq_34337272/article/details/80012284
 
 - redlock
 
+<<<<<<< HEAD
+### 延时队列
+
+```java
+package com.unicom.sharecenter.utils;
+
+import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RBlockingDeque;
+import org.redisson.api.RDelayedQueue;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+
+/**
+ * @version 1.0 利用redission做延时队列
+ * @author: zb
+ * @date: 2020/06/01/12:55
+ * @description:
+ */
+@Service
+@Slf4j
+public class RedisDelayedQueue {
+
+    @Autowired
+    private RedissonClient redissonClient;
+
+
+    /**
+      * @Description: 添加延时队列
+      * @Param: 
+      * @return: 
+      * @Author: zb
+      * @Date: 2020/6/1
+    */    
+    public <T> void addQueue(T t, long delay, TimeUnit timeUnit){
+        log.info("添加延时队列：{}",t.getClass().getName());
+        RBlockingDeque<T> blockingDeque = redissonClient.getBlockingDeque(t.getClass().getName());
+        RDelayedQueue<T> delayedQueue = redissonClient.getDelayedQueue(blockingDeque);
+        delayedQueue.offer(t,delay,timeUnit);
+        delayedQueue.destroy();
+    }
+
+
+   /**
+     * @Description: 主动获取延时队列
+     * @Param: 
+     * @return: 
+     * @Author: zb
+     * @Date: 2020/6/1
+   */
+    public <R> void getActiveQueue(Class zClass, Consumer<R> consumer){
+        log.info("主动获取延时队列：{}",zClass.getName());
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                RBlockingDeque<R> blockingDeque = redissonClient.getBlockingDeque(zClass.getName());
+                try {
+                    if(!blockingDeque.isEmpty()){
+                        R take = blockingDeque.take();
+                        consumer.accept(take);//执行获取队列后需要执行的代码
+
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        /**
+         * 定长线程池，支持定时及周期性任务执行
+         */
+        ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(1);
+
+        //首次执行延迟1s，每次间隔3秒
+        scheduledThreadPool.scheduleAtFixedRate(thread, 1, 3, TimeUnit.SECONDS);
+    }
+   /**
+     * @Description: 获取延时队列
+     * @Param:
+     * @return:
+     * @Author: zb
+     * @Date: 2020/6/1
+   */
+    public <T> void getQueue(Class zClass, Consumer<T> consumer){
+       RBlockingDeque<T> blockingDeque = redissonClient.getBlockingDeque(zClass.getName());
+       try {
+           if(!blockingDeque.isEmpty()){
+               T take = blockingDeque.take();
+               consumer.accept(take);//执行获取队列后需要执行的代码
+
+           }
+       } catch (InterruptedException e) {
+           e.printStackTrace();
+       }
+    }
+
+}
+// RQueue<R> blockingDeque = redissonClient.getQueue(zClass.getName());
+                 //   if(!blockingDeque.isEmpty()){
+                    //    R take = blockingDeque.poll();
+  ////                      consumer.accept(take);//执行获取队列后需要//执行的代码
+
+  //                  }
+```
+
+```java
+package com.unicom.sharecenter.utils;
+
+import com.unicom.sharecenter.module.equitycenter.DTO.RightOrderDelayQueue;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
+
+/**
+ * @version 1.0 启动钩子，在项目启动时调用方法
+ * @author: zb
+ * @date: 2020/06/01/17:47
+ * @description:
+ */
+@Slf4j
+@Component
+public class RedisDelayedQueueConsume implements CommandLineRunner {
+    @Autowired
+    private RedisDelayedQueue redisDelayedQueue;
+    @Autowired
+    private RightLimitUtils rightLimitUtils;
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    @Override
+    public void run(String... args) throws Exception {
+        ValueOperations valueOperations = redisTemplate.opsForValue();
+        redisDelayedQueue.getActiveQueue(RightOrderDelayQueue.class,(t)->{
+            log.info("获取延时队列：{}",t);
+            RightOrderDelayQueue orderDelayQueue = (RightOrderDelayQueue)t;
+            Long fail = Long.valueOf(Optional.ofNullable(valueOperations.get(orderDelayQueue.getRightOrderFailureAmount())).orElse(0).toString());//失败率
+            Long sum = Long.valueOf(Optional.ofNullable(valueOperations.get(orderDelayQueue.getRightOrderQuantity())).orElse(0).toString());//下单量
+            double v = fail * 1.0 / sum;
+            boolean flag = false;
+            if(sum <=10){
+                if(v>0.5)
+                    flag = true;
+            }else if(10<sum && sum<=50){
+                if(v>0.3)
+                    flag = true;
+            }else if( 50<sum && sum<=100 ){
+                if(v>0.2)
+                    flag = true;
+            }else if(100 <sum){
+                if(v>0.1)
+                    flag = true;
+            }
+            if(flag){  //发放预警短信
+                System.out.println(sum+"发放预警短信"+v);
+//                rightLimitUtils.sendMessage(rightLimitUtils.getRightLimit(),String.format(EquitystorecenterConstant.ALARMCONTEXT, v *100));
+            }
+        });
+    }
+}
+
+```
+
+# redis实现查找附近距离
+
+- GEOADD ：添加元素位置信息
+- GEOPOS：查询元素经纬度信息
+- GEODIST：查询两个元素的直线距离
+- GEOADIUS：查找附近一定距离内的元素
+- GEOHASH：返回一个或多个位置对象的Geohash表示
+- GEORADIUSBYMEMBER：以给定的位置对象为中心，返回与其距离不超过给定最大距离的所有位置对象
 # Redis面试常见问答
 
 <https://mp.weixin.qq.com/s?__biz=MzIyNDU2ODA4OQ==&mid=2247483948&idx=1&sn=0f8df6ffcbc89d60658992e8920d6cf7&chksm=e80db45adf7a3d4cd425e93c994a50dd92ccefcc67d435d50233f2bedc4f860ed1da24adc974&scene=21#wechat_redirect>
