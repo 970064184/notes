@@ -692,7 +692,7 @@ public List<String> filterStr(List<String> list, Predicate<String> pre) {
 
 #### 其他接口
 
-![](/images/QQ截图20180822141258.png)
+![](images/QQ截图20180822141258.png)
 
   
 
