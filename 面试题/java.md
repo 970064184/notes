@@ -411,6 +411,8 @@ String 和 StringBuffer、StringBuilder 的区别在于 String 声明的是不�
 
 StringBuffer 和 StringBuilder 最大的区别在于，StringBuffer 是线程安全的，而 StringBuilder 是非线程安全的，但 StringBuilder 的性能却高于 StringBuffer，所以在单线程环境下推荐使用 StringBuilder，多线程环境下推荐使用 StringBuffer。
 
+![](images/20180411091757991.png)
+
 8. String str="i"与 String str=new String("i")一样吗？
 
 不一样，因为内存的分配方式不一样。String str="i"的方式，Java 虚拟机会将其分配到常量池中；而 String str=new String("i") 则会被分到堆内存中。

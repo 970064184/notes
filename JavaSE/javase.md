@@ -2312,7 +2312,7 @@ public class ConcurrencyTest {
 
 ### 强制类型转换
 
-- 从存储范围小的类型到存储范围大的类型（会存在精度的损失）
+- 从存储范围大的类型到存储范围小的类型（会存在精度的损失）
   - double→float→long→int→short(char)→byte
 
 ## 自增变量 ++、--
