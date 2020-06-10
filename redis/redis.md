@@ -1209,6 +1209,8 @@ redis事务的3特性：
 
   由于所有的写操作都是先在master上操作，然后同步更新到slave上，所以从master同步到slave机器有一定的延迟，当系统很繁忙时，延迟问题会更加严重，slave机器数量的增加也会使这个问题更加严重
 
+#### 原理：
+
 ## Jedis
 
 ```java
@@ -1311,7 +1313,7 @@ http://blog.51cto.com/13961945/2174326（面试题）
 - 缓存雪崩：指缓存服务器重启或者大量缓存集中在某一个时间段失效
 
   - <https://blog.csdn.net/qq_35190492/article/details/102889333?depth_1-utm_source=distribute.pc_relevant.none-task&utm_source=distribute.pc_relevant.none-task> 
-
+  - <https://baijiahao.baidu.com/s?id=1655304940308056733&wfr=spider&for=pc> 
   - 解决方案：
     - 对不同的数据使用不同的失效时间，甚至对相同的数据、不同的请求使用不同的失效时间
 
@@ -1435,7 +1437,6 @@ https://blog.csdn.net/qq_34337272/article/details/80012284
 
 - redlock
 
-<<<<<<< HEAD
 ### 延时队列
 
 ```java
@@ -1631,4 +1632,33 @@ public class RedisDelayedQueueConsume implements CommandLineRunner {
 ![](images/QQ图片20200513223904.jpg)
 
 > ①线程读数据时发现缓存刚好失效然后去读db，在读db后写Redis之前，②线程做了更新数据库，并删除缓存，然后①线程再把读到的数据（更新前的数据）写到缓存中，那么久会出现放到Redis中的数据永远都是旧数据，直到这个缓存数据失效
+
+# Redis为什么那么快？
+
+## 纯内存KV操作
+
+- 数据存在内存中，类似于HashMap，HashMap的优势就是查找和操作的时间复杂度都是O(1)
+
+## 内部是单线程实现的（不需要创建/销毁线程，避免上下文切换，无并发资源竞争的问题）
+
+- Redis的瓶颈不在线程，不存在多进程或多线程导致的切换带来多余的资源占用而消耗CPU，比如上下文切换、资源竞争、锁的操作
+  - 上下文的切换
+    - 上下文其实就是**CPU寄存器**和程序计数器。**主要作用是存放没有被分配到资源的线程，**多线程操作的时候，不是每一个线程都能够直接获取到CPU资源的，之所以能够看到电脑上能够运行很多的程序，是因为多线程的执行和CPU不断对多线程的切换，速度足够快。但是总有线程获取到资源，也有线程需要等待获取资源。这个时候，等待获取资源的线程就需要被挂起，也就是寄存。这时候上下文就产生了，当上下文再次被唤起，得到资源的时候，就是上下文的切换。
+  - 竞争资源
+    - CPU对上下文的切换其实就是一种资源分配，但在切换之前，**到底切换到哪一个上下文，就是资源竞争**的的开始。在Redis中由于是单线程的，所以所有的操作都不会涉及到资源的竞争。
+  - 锁的消耗
+    - 对于多线程的情况，如果说多线程操作出现并发，有可能导致数据不一致，或者操作达不到预期的效果。这时就需要锁来解决，当线程很多的时候，就需要不断加锁，释放锁，这个过程就会消耗很多的时间
+
+## 异步非阻塞的I/O （多路复用）
+
+- I/O操作的阻塞：当用户线程发出IO请求之后，内核会去查看数据是否就绪，如果没有就绪就会等待数据就绪，而用户线程就会处于阻塞状态，并且用户线程交出CPU。当数据就绪之后，内核就会将数据拷贝到用户线程，并返回结果给用户线程，用户线程才解除block状态。
+- Redis采用多路复用：I/O多路复用其实就是在单个线程中通过记录跟踪每一个sock（I/O流）的状态来管理多个I/O流。select，poll，epoll都是I/O多路复用的具体实现。epoll性能比其他几个要好。Redis中的I/O多路复用的所有功能通过包装常见的select、epoll、evport和kqueue这些I/O多路复用函数库来实现的（尽量减少网络IO的时间消耗）
+  - 多路：指多个网络连接
+  - 复用：复用同一个线程
+
+# 5种数据结构底层原理
+
+<https://blog.csdn.net/wangxuelei036/article/details/106188908>
+
+<https://blog.csdn.net/Future_LL/article/details/89514924?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase>
 

@@ -1,5 +1,7 @@
-第一章：并发编程中的三个问题
-可见性
+# 第一章：并发编程中的三个问题
+
+## 可见性
+
 学习什么是可见性问题
 
 可见性概念
@@ -20,7 +22,8 @@
 
 后的最新值。
 
-原子性
+## 原子性
+
 学习什么是原子性问题
 
 原子性概念
@@ -51,7 +54,8 @@
 
 并发编程时，会出现原子性问题，当一个线程对共享变量操作到一半时，另外的线程也有可能来操作共 享变量，干扰了前一个线程的操作。
 
-有序性
+## 有序性
+
 学习什么是有序性问题
 
 有序性概念
@@ -96,7 +100,8 @@ java -jar target/jcstress.jar
 
 就是开发者编写代码时的顺序。
 
-第二章：Java内存模型(JMM)
+# 第二章：Java内存模型(JMM)
+
 在介绍Java内存模型之前，先来看一下到底什么是计算机内存模型。
 
 计算机结构
@@ -144,7 +149,8 @@ Cache的出现是为了解决CPU直接访问内存效率低下问题的，程序
 
 计算机的主要组成CPU，内存，输入设备，输出设备。
 
-Java内存模型
+## Java内存模型
+
 目标
 
 学习Java内存模型的概念和作用
@@ -164,7 +170,7 @@ Java内存模型是一套规范，描述了Java程序中各种变量(线程共�
 Java内存模型的作用
 Java内存模型是一套在多线程读写共享数据时，对共享数据的可见性、有序性、和原子性的规则和保障。
 
-synchronized,volatile
+## synchronized,volatile
 
 CPU缓存，内存与Java内存模型的关系
 通过对前面的CPU硬件内存架构、Java内存模型以及Java多线程的实现原理的了解，我们应该已经意识到，多线程的执行最终都会映射到硬件处理器上进行执行。
@@ -204,7 +210,7 @@ Java内存模型中定义了以下8种操作来完成，主内存与工作内存
  lock -> read -> load -> use -> assign -> store -> write -> unlock
 ```
 
-第三章：synchronized保证三大特性
+# 第三章：synchronized保证三大特性
 
 synchronized能够保证在同一时刻最多只有一个线程执行该段代码，以达到保证并发安全的效果。
 
@@ -214,7 +220,8 @@ synchronized能够保证在同一时刻最多只有一个线程执行该段代�
 }
 ```
 
-synchronized与原子性
+## synchronized与原子性
+
 学习使用synchronized保证原子性的原理
 
 使用synchronized保证原子性
@@ -232,7 +239,8 @@ synchronized保证原子性的原理
 
 synchronized保证原子性的原理，synchronized保证只有一个线程拿到锁，能够进入同步代码块。
 
-synchronized与可见性
+## synchronized与可见性
+
 学习使用synchronized保证可见性的原理
 
 使用synchronized保证可见性
@@ -249,7 +257,8 @@ synchronized保证可见性的原理
 
 synchronized保证可见性的原理，执行synchronized时，会对应lock原子操作会刷新工作内存中共享变 量的值
 
-synchronized与有序性
+## synchronized与有序性
+
 学习使用synchronized保证有序性的原理
 
 为什么要重排序
@@ -327,7 +336,8 @@ synchronized后，虽然进行了重排序，保证只有一个线程会进入�
 
 synchronized保证有序性的原理，我们加synchronized后，依然会发生重排序，只不过，我们有同步 代码块，可以保证只有一个线程执行同步代码中的代码。保证有序性
 
-第四章：synchronized的特性
+# 第四章：synchronized的特性
+
 可重入特性
 
 了解什么是可重入
@@ -344,7 +354,7 @@ synchronized保证有序性的原理，我们加synchronized后，依然会发�
 
 
 
-可重入原理
+## 可重入原理
 
 synchronized的锁对象中有一个计数器（recursions变量）会记录线程获得几次锁.
 
@@ -363,7 +373,7 @@ synchronized是可重入锁，内部锁对象中会有一个计数器记录线�
 
 学习Lock的可中断特性
 
-什么是不可中断
+## 什么是不可中断
 
 一个线程获得锁后，另一个线程想要获得锁，必须处于阻塞或等待状态，如果第一个线程不释放锁，第二个线程会一直阻塞或等待，不可被中断。
 
@@ -395,7 +405,8 @@ Lock的lock方法是不可中断的
 
 Lock的tryLock方法是可中断的
 
-第五章：synchronized原理
+# 第五章：synchronized原理
+
 javap 反汇编
 
 通过javap反汇编学习synchronized的原理
@@ -535,7 +546,9 @@ monitorexit释放锁。
 
 monitorexit插入在方法结束处和异常处，JVM保证每个monitorenter必须有对应的monitorexit。
 
-面试题synchroznied出现异常会释放锁吗?
+## 面试题
+
+### synchroznied出现异常会释放锁吗?
 
 会释放锁
 
@@ -549,7 +562,7 @@ https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html#jvms-2.11.10
 
 通过javap反汇编我们看到synchronized使用编程了monitorentor和monitorexit两个指令.每个锁对象 都会关联一个monitor(监视器,它才是真正的锁对象),它内部有两个重要的成员变量owner会保存获得锁 的线程,recursions会保存线程获得锁的次数,当执行到monitorexit时,recursions会-1,当计数器减到0时这个线程就会释放锁
 
-面试题：synchronized与Lock的区别
+### 面试题：synchronized与Lock的区别
 
 1. synchronized是关键字，而Lock是一个接口。
 
@@ -566,7 +579,8 @@ https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html#jvms-2.11.10
 7. synchronized是非公平锁，ReentrantLock可以控制是否是公平锁。
 
 深入JVM源码
-通过JVM源码分析synchronized的原理
+
+## 通过JVM源码分析synchronized的原理
 
 JVM源码下载
 
@@ -806,8 +820,9 @@ monitor是重量级锁
 
 由此可见用户态切换至内核态需要传递许多变量，同时内核还需要保护好用户态在切换时的一些寄存器值、变量等，以备内核态切换回用户态。这种切换就带来了大量的系统资源消耗，这就是在synchronized未优化之前，效率低的原因。
 
-第六章：JDK6 synchronized优化
-CAS
+# 第六章：JDK6 synchronized优化
+
+## CAS
 
 学习CAS的作用
 
@@ -838,12 +853,11 @@ for (int i = 0; i < 5; i++) {
 Thread t = new Thread(mr);
 ```
 
-
-CAS原理
+### CAS原理
 
 通过刚才AtomicInteger的源码我们可以看到，Unsafe类提供了原子操作。
 
-Unsafe类介绍
+#### Unsafe类介绍
 
 Unsafe类使Java拥有了像C语言的指针一样操作内存空间的能力，同时也带来了指针的问题。过度的使用Unsafe类会使得出错的几率变大，因此Java官方并不建议使用的，官方文档也几乎没有。Unsafe对象不能直接调用，只能通过反射获得。
 
@@ -876,7 +890,7 @@ CAS的作用? Compare And Swap，CAS可以将比较和交换转换为原子操�
 
 CAS的原理？CAS需要3个值:内存地址V，旧的预期值A，要修改的新值B，如果内存地址V和旧的预期值A相等就修改内存地址值为B
 
-synchronized锁升级过程
+## synchronized锁升级过程
 
 高效并发是从JDK 5到JDK 6的一个重要改进，HotSpot虛拟机开发团队在这个版本上花费了大量的精力去实现各种锁优化技术，包括偏向锁( Biased Locking )、轻量级锁( Lightweight Locking )和如适应性自旋(Adaptive Spinning)、锁消除( Lock Elimination)、锁粗化( Lock Coarsening )等，这些技术都是为了在线程之间更高效地共享数据，以及解决竞争问题，从而提高程序的执行效率。
 
@@ -1055,7 +1069,7 @@ Java对象由3部分组成，对象头，实例数据，对齐数据
 
 对象头分成两部分：Mark World + Klass pointer
 
-偏向锁
+### 偏向锁
 
 学习偏向锁的原理和好处
 
@@ -1069,7 +1083,7 @@ Java对象由3部分组成，对象头，实例数据，对齐数据
 
 不过一旦出现多个线程竞争时必须撤销偏向锁，所以撤销偏向锁消耗的性能必须小于之前节省下来的 CAS原子操作的性能消耗，不然就得不偿失了。
 
-偏向锁原理
+#### 偏向锁原理
 
 当线程第一次访问同步块并获取锁时，偏向锁处理流程如下：
 
@@ -1104,7 +1118,7 @@ Java对象由3部分组成，对象头，实例数据，对齐数据
 
 偏向锁是在只有一个线程执行同步块时进一步提高性能，适用于一个线程反复获得同一锁的情况。偏向锁可以提高带有同步但无竞争的程序性能。
 
-轻量级锁
+### 轻量级锁
 
 学习轻量级锁的原理和好处
 
@@ -1112,7 +1126,7 @@ Java对象由3部分组成，对象头，实例数据，对齐数据
 
 轻量级锁是JDK 6之中加入的新型锁机制，它名字中的“轻量级”是相对于使用monitor的传统锁而言的，因此传统的锁机制就称为“重量级”锁。首先需要强调一点的是，轻量级锁并不是用来代替重量级锁的。引入轻量级锁的目的：在多线程交替执行同步块的情况下，尽量避免重量级锁引起的性能消耗，但是如果多个线程在同一时刻进入临界区，会导致轻量级锁膨胀升级重量级锁，所以轻量级锁的出现并非是要替代重量级锁。
 
-轻量级锁原理
+#### 轻量级锁原理
 
 当关闭偏向锁功能或者多个线程竞争偏向锁导致偏向锁升级为轻量级锁，则会尝试获取轻量级锁，其步骤如下： 获取锁
 
@@ -1148,7 +1162,7 @@ Java对象由3部分组成，对象头，实例数据，对齐数据
 
 在多线程交替执行同步块的情况下，可以避免重量级锁引起的性能消耗。
 
-自旋锁
+### 自旋锁
 
 学习自旋锁原理
 
@@ -1172,7 +1186,9 @@ System.out.println("aaa");
 
 在JDK 6中引入了自适应的自旋锁。自适应意味着自旋的时间不再固定了，而是由前一次在同一个锁上的自旋时间及锁的拥有者的状态来决定。如果在同一个锁对象上，自旋等待刚刚成功获得过锁，并且持有锁的线程正在运行中，那么虚拟机就会认为这次自旋也很有可能再次成功，进而它将允许自旋等待持续相对更长的时间，比如100次循环。另外，如果对于某个锁，自旋很少成功获得过，那在以后要获取这个锁时将可能省略掉自旋过程，以避免浪费处理器资源。有了自适应自旋，随着程序运行和性能监控信息的不断完善，虚拟机对程序锁的状况预测就会越来越准确，虛拟机就会变得越来越“聪明”了。
 
-锁消除
+#### 锁消除
+
+<https://blog.csdn.net/qq_26222859/article/details/80546917>
 
 学习如何进行锁消除
 
@@ -1197,22 +1213,43 @@ return new StringBuffer().append(s1).append(s2).append(s3).toString();
 
 StringBuffffer的append ( ) 是一个同步方法，锁就是this也就是(new StringBuilder())。虚拟机发现它的动态作用域被限制在concatString( )方法内部。也就是说, new StringBuilder()对象的引用永远不会“逃逸”到concatString ( )方法之外，其他线程无法访问到它，因此，虽然这里有锁，但是可以被安全地消除掉，在即时编译之后，这段代码就会忽略掉所有的同步而直接执行了。
 
-锁粗化
+#### 锁粗化
 
 学习锁粗化的原理
 
 ```java
 
 
-public class Demo01 { 
-public static void main(String[] args) { 
-contactString("aa", "bb", "cc"); 
+for(int i=0;i<size;i++){
+    synchronized(lock){
+    }
 }
-public static String contactString(String s1, String s2, String s3) { 
-return new StringBuffer().append(s1).append(s2).append(s3).toString(); 
-} 
+//锁粗化后
+synchronized(lock){
+    for(int i=0;i<size;i++){
+    }
 }
 
+
+
+public void doSomethingMethod(){
+    synchronized(lock){
+        //do some thing
+    }
+    //这是还有一些代码，做其它不需要同步的工作，但能很快执行完毕
+    synchronized(lock){
+        //do other thing
+    }
+}
+//锁粗化后
+public void doSomethingMethod(){
+    //进行锁粗化：整合成一次锁请求、同步、释放
+    synchronized(lock){
+        //do some thing
+        //做其它不需要同步但能很快执行完的工作
+        //do other thing
+    }
+}
 ```
 
 
