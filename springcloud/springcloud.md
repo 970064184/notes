@@ -434,3 +434,10 @@ https://blog.csdn.net/weixin_40834464/article/details/88850523
 - consul client将注册信息通过RPC转发到consul server，服务信息保存在server的各个节点中，并且通过raft实现了强一致性。
 - 服务器server6中program D要访问serviceB，此时program D要先访问本机consul client提供的HTTP API，consul Client会将请求转发到consul server。consul server查询到service B并返回，最终program D拿到了service B的所有部署的IP和端口，根据负载均衡策略，选择service B的其中一个并向其发起请求。
   - 如果服务发现采用的是DNS方式，则program D中使用service B的服务实现域名，域名解析请求首先到达本机DNS代理，然后转发到本机consul client，consul client会将请求转发到consul server。
+
+# nacos
+
+# sentinel
+
+![](images/QQ截图20200611131950.png)
+
