@@ -12,7 +12,7 @@
 
 - 解决办法是：降低Autowired检测的级别，将Severity的级别由之前的error改成warning
 
-![](C:/Users/Administrator/Desktop/notes/%E4%B9%B1%E4%B8%83%E5%85%AB%E7%B3%9F/images/QQ%E6%88%AA%E5%9B%BE20191207164153.png)
+![](images/QQ%E6%88%AA%E5%9B%BE20191207164153.png)
 
 ## Auto import
 
@@ -220,3 +220,22 @@ mvn help:effective -pom //查看完整的pom信息
 - **Free Mybatis plugin -Mybatis 辅助插件**
 
 - maven help：解决jar冲突
+
+# 骚技巧
+
+## 快速补全行末分号
+
+shfit+ctrl +enter
+
+## 自带的HTTP请求工具
+
+Shfit+Ctrl+A
+
+
+
+## Language Injection
+
+将String转换为JSON格式，不用担心转换字符串时的转义问题
+
+![](images/QQ截图20200721102440.png)
+

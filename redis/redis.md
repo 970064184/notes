@@ -1662,3 +1662,12 @@ public class RedisDelayedQueueConsume implements CommandLineRunner {
 
 <https://blog.csdn.net/Future_LL/article/details/89514924?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.nonecase>
 
+# redis 键空间通知
+
+> 健空间通知使得客户端可以通过订阅频道或模式，来接收那些以某种方式改动了Redis数据集的事件。
+
+http://redisdoc.com/topic/notification.html
+
+> springboot 整合Redis实现keySpaceNotification
+>
+> https://blog.csdn.net/xueyunzi1/article/details/82818953
