@@ -129,11 +129,34 @@ https://blog.csdn.net/zhangliao613/article/details/79021606
 - 查看内存总数
 
   - cat /proc/meminfo |grep MemTotal
+  
   - free -m :查看内存使用量和交换区使用量
+  
+  - free -h ：查看内存，显示单位为G
+  
   - uptime：查看系统运行时间、用户数、负载
+  
   - fdisk -l：查看所有分区
+  
   - last：查看用户登录日志
+  
   - dmidecode |grep -A16 "Memory Device$"：查看内存条数
+  
+  - 查看进程cpu和内存占用率排序
+  
+    - ps -aux | sort -k4,4n
+  
+      ps auxw --sort=rss（+rss 正序，-rss倒序）
+  
+      ps auxw --sort=%cpu
+  
+       - %cpu 进程的cpu占用率
+         %mem 进程的内存占用率
+         vsz 进程所使用的虚存的大小
+         rss 进程使用的驻留集大小或者是实际内存的大小
+       - https://www.linuxprobe.com/linux-sort-max-mc.html
+  
+  - 
 
 ## vi/vim 
 
