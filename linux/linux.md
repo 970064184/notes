@@ -64,13 +64,14 @@ https://blog.csdn.net/zhangliao613/article/details/79021606
     - userdel -r 用户名：删除用户时，把用户的家目录都删除
   - id 用户名：查询用户信息
   - whoami / who am i ：查看当前用户
+  - last：查看最近的登录历史记录
+  - who：查看当前在线
   - groupadd  组名：增加组
-  - groupdel 组名：删除组
+- groupdel 组名：删除组
   - usermod -g 用户组 用户名：修改用户的组
-
   - init[0 1 2 3 4 5 6]：切换运行级别
-  - usermod -d 目录名 用户名 ：修改该用户登录的初始目录
-
+- usermod -d 目录名 用户名 ：修改该用户登录的初始目录
+  
 - 系统磁盘分区
 
   - lsblk：查看当前系统的分区情况
@@ -155,6 +156,8 @@ https://blog.csdn.net/zhangliao613/article/details/79021606
          vsz 进程所使用的虚存的大小
          rss 进程使用的驻留集大小或者是实际内存的大小
        - https://www.linuxprobe.com/linux-sort-max-mc.html
+       - ps -eo pid,lstart,etime,cmd | grep mongo：查看启动时间、运行时间
+       - ps aux | sort -k4,4nr | head -n 10 ：查看内存占用前10名的程序
   
   - 
 
@@ -168,7 +171,7 @@ https://blog.csdn.net/zhangliao613/article/details/79021606
     - 相关快捷键
       - 复制当前行：yy、5yy（拷贝当前行向下的5行）、粘贴：p
       - 删除当前行：dd、5dd（删除当前行向下的5行）
-      - 查找某个单词：命令行下：/关键字，回车查找，输入n就是查找下一个查找的结果
+      - 查找某个单词：命令行下：/关键字，回车查找，输入n就是查找下一个查找的结果（按N定位到上一个）
       - 设置文件的行号：命令行下：:set nu；取消文件的行号：:set nonu
       - 跳到文档的最末行：G；最首行：gg
       - 撤销输入动作：u
@@ -176,6 +179,13 @@ https://blog.csdn.net/zhangliao613/article/details/79021606
         - 显示行号:set nu
         - 输入行数
         - 输入shift+g
+      - a：在光标后一位开始插入
+      - A：在改行的最后插入
+      - I：在该行的最前面插入
+      - v：进入字符选择模式，选择完成后，按y复制，按p粘贴
+      - Ctrl+v：进入块选择模式，选择完成后，按y复制，按p粘贴
+      - shift+v：进入行选择模式，选择完成后，按y复制，按p粘贴
+      - 查找并替换：%s/sad/888888（效果：查找文件中所有sad，替换成888888)
 
 
   - 插入模式/编辑模式
@@ -270,7 +280,7 @@ https://blog.csdn.net/zhangliao613/article/details/79021606
 
 - more：按页显示文本文件的内容
 
-  - space：代表向下翻一页
+  - space：代表向下翻一页(b：向上翻一页)
   - Enter：代表向下翻一行
   - q：代表立刻离开more，不再显示该文件内容
   - Ctrl+F ：向下滚动一屏
@@ -570,6 +580,11 @@ https://blog.csdn.net/zhangliao613/article/details/79021606
     > - ps -aux | grep bash
     > - ![](images/QQ截图20181121151826.png) 
 
+  - 查看进程运行的完整路径方法
+
+    
+      - ll /proc/PID
+    
   - pstree：查看进程树
 
     - -p：显示进程的PID
@@ -712,6 +727,8 @@ https://blog.csdn.net/zhangliao613/article/details/79021606
 ## 权限管理 
 
 ![](images/QQ截图20181120154651.png) 
+
+d：标识节点类型（d：文件夹	-：文件	l：链接）
 
 ![](images/QQ截图20181120154936.png)
 
@@ -914,7 +931,9 @@ Nat网络地址转换模式：
 
 > 当执行严格shell脚本时，如果希望获取到命令行的参数信息，就可以使用位置参数变量，比如：./myshell.sh 100 200 ，这个就是一个执行shell的命令行，可以在myshell脚本中获取到参数信息
 
-$n（功能描述： n 为数字，代表命令本身，代表第一到第9个参数，10以上的参数需要用大括号包含）
+$n（功能描述： n 为数字，代表命令本身，代表第一到第9个参数($1-$9)，10以上的参数需要用大括号包含：${10}）
+
+​	- $0代表该脚本名称
 
 $*（功能描述：这个变量代表命令行中所有的参数，把所有的参数看成一个整体）
 
@@ -937,6 +956,12 @@ $?：（功能描述：最后一次执行的命令的返回状态，如果这个
 ###  运算符 
 
 ![](images/QQ截图20181128161146.png)
+
+```shell
+expr 'expr 2 + 3' \
+```
+
+
 
  ![](images/QQ截图20181128162331.png)
 
@@ -1053,4 +1078,93 @@ $?：（功能描述：最后一次执行的命令的返回状态，如果这个
     echo "======备份文件成功======"
     ```
 
+### 上一条命令的值赋值给一个变量
 
+![](images/QQ截图20200924154522.png)
+
+![](images/QQ截图20200924154708.png)
+
+### shell中的特殊变量
+
+![](images/QQ截图20200924160953.png)
+
+
+
+# 重启自启动
+
+https://www.jb51.net/article/188646.htm
+
+## **方法一：使用 crontab**
+
+```shell
+[root@localhost ~]# crontab -l
+@reboot /usr/local/nginx/sbin/nginx -c /usr/local/nginx/conf/nginx.conf
+```
+
+
+
+## 方法二：使用systemd服务
+
+```shell
+[root@localhost ~]# cd /etc/systemd/system;ls
+auto_run_custom_script.service  
+[root@localhost ~]#vi auto_run_custom_script.service  
+[Unit]
+Description=Run a Custom Script at Startup
+After=default.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/data_new/spring-cloud/auto_run_custom_script.sh
+
+[Install]
+WantedBy=default.target
+~                             
+[root@localhost ~]#systemctl daemon-reload
+[root@localhost ~]#systemctl enable auto_run_custom_script.service  
+[root@localhost ~]#journalctl -u auto_run_custom_script.service
+[root@localhost ~]#reboot//重启
+[root@localhost ~]#
+```
+
+
+
+# 坑
+
+## 生产机器中了挖矿病毒
+
+![](images/QQ图片20200915175510.png)
+
+![](images/QQ图片20200915175621.png)
+
+![](images/QQ图片20200915175637.png)
+
+![](images/QQ图片20200915175410.png)
+
+![](images/QQ图片20200915175440.png)
+
+解决方案：
+
+- 删掉定时器
+  - crontab -r
+- 停掉进程
+  - kill -9
+- 改密码
+
+## linux下内存buff/cache占用过多问题解决
+
+![](images/QQ截图20200927165401.png)
+
+解决办法：
+
+```java
+//三次清除操作，可用内存明显增加
+echo 1 > /proc/sys/vm/drop_caches
+echo 2 > /proc/sys/vm/drop_caches
+echo 3 > /proc/sys/vm/drop_caches
+```
+
+
+
+![](images/QQ截图20200927165459.png)

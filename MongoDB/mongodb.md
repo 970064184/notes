@@ -81,11 +81,32 @@ db.getCollection("User").find({nickname:/张/})
 db.getCollection("User").find({_id:ObjectId("5efc5fa8c918f5711233ccaa")})
 ```
 
+## in & notin & remove
+
+```java
+db.getCollection("Server").find({_id:{$in:["1", "2", "777", "11212", "111", "31"]}})
+db.getCollection("Creative").remove({"projectId":NumberInt(7),"title":{ $nin : ["大渠道","小渠道01"] }})
+```
+
+## count && 是否存在此字段
+
+```java
+db.getCollection('Creative').find({"projectId":{"$exists":false}}).count()
+```
+
 ## 数组中包含某个值的查询
 
 ```sq
 db.User.find({projectIds:{$elemMatch:{$eq:3}}})
 ```
+
+## 更新
+
+```java
+db.getCollection("Creative").update({"projectId":{$exists:false}}, {$set:{'projectId':NumberInt(7)}},{multi:true})
+```
+
+remove && not in
 
 ## 事务测试
 
@@ -124,5 +145,48 @@ try {
 }
 session.commitTransaction();
 session.endSession();
+```
+
+## 查询文档值
+
+```java
+db.getCollection("User").find({"roles.7":ObjectId("5f69a39bca0bcfe8078a10a9")})
+```
+
+> //字段名：roles
+>
+> {
+>     7: [
+>         ObjectId("5f69a39bca0bcfe8078a10a9")
+>     ],
+>     8: [
+>         ObjectId("5f69a79dca0bcfe8078a10fa")
+>     ]
+> }
+
+
+
+## 批量修改字段类型
+
+```sql
+###https://blog.csdn.net/qq_24678987/article/details/80547866
+
+db.Server.find({updateTime:{$type:"string"}}).forEach( function (x) {
+ x.updateTime = new ISODate(x.updateTime);
+  db.Server.save(x);
+});
+
+
+```
+
+## 修改字段名
+
+```sql
+db.columnsample.updateMany(
+{},
+{
+  "$rename":{"remponse":"response"}
+}
+)
 ```
 

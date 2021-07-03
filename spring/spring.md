@@ -972,6 +972,33 @@ String condition() default ""; //条件符合则清空
     }
 ```
 
+### SpEI表达式
+
+![](images/QQ截图20200929144526.png)
+
+```java
+  @Override
+    @Cacheable(value = "BackgroundConfig",key = "#key+'_'+#probjectId")
+    public String getValueByKeyAndProbjectId(String key, Integer probjectId) {
+        System.out.println("key:"+key+"；probjectId："+probjectId);
+        Query query = Query.query(Criteria.where("key").is(key)).addCriteria(Criteria.where("projectId").is(probjectId));
+        BackgroundConfig one = mongoTemplate.findOne(query, BackgroundConfig.class);
+        return one.getValue();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = "BackgroundConfig",key = "#result.key+'_'+#result.projectId")
+    public BackgroundConfig deleteById(String id) {
+        Query query = Query.query(Criteria.where("id").is(id));
+        BackgroundConfig one = mongoTemplate.findOne(query, BackgroundConfig.class);
+        mongoTemplate.remove(query, BackgroundConfig.class);
+        return one;
+    }
+```
+
+
+
 # spring循环依赖及解决方式 
 
 # 坑

@@ -1,5 +1,7 @@
 # 命令行操作mysql
 
+- 重启mysql：/etc/init.d/mysqld restart
+
 - mysql -u root -p root：进入mysql
 
 - show databases：显示所有数据库
@@ -838,3 +840,87 @@ alter table 表名 alter column 字段名 set default 默认值;(若本身不存
 
 **排他锁【X锁】**
 又称写锁。若事务T对数据对象A加上X锁，事务T可以读A也可以修改A，其他事务不能再对A加任何锁，直到T释放A上的锁。这保证了其他事务在T释放A上的锁之前不能再读取和修改A。
+
+
+
+# binlog
+
+## 坑
+
+### binlog记录的列值有缺问题
+
+问题：
+
+![](images/微信图片_20201105172702.png)
+
+![](images/微信图片_20201105172758.png)
+
+![](images/微信图片_20201105172811.png)
+
+insert 字段数据完整，update或delete字段数据缺失
+
+
+
+解决办法：
+
+![](images/QQ截图20201105172510.png)
+
+![](images/QQ截图20201105172641.png)
+
+```sql
+SET GLOBAL binlog_row_image ='FULL';
+
+SHOW VARIABLES LIKE 'binlog_format'
+SHOW VARIABLES LIKE 'binlog_row_image'
+
+SHOW VARIABLES LIKE 'log_bin';
+
+SET SESSION binlog_row_image ='FULL';
+
+```
+
+
+
+## 查看日志
+
+```sql
+ps -ef|grep mysql
+cd (--datadir=)/data/mysql-3306/data
+
+    //查看binlog日志文件有哪些
+SHOW BINARY LOGS;
+    
+//查看delete日志
+mysqlbinlog --no-defaults --base64-output=DECODE-ROWS -vvv mysql-bin.000003|grep DELETE |more
+
+//查看全部日志
+mysqlbinlog --no-defaults --base64-output=DECODE-ROWS -vvv mysql-bin.000003
+
+//查看指定数据库日志
+mysqlbinlog --no-defaults --database=infocenter  mysql-bin.000003 |grep DELETE |more
+    
+    
+    SHOW VARIABLES LIKE 'binlog_format'
+SHOW VARIABLES LIKE 'binlog_row_image'
+
+SHOW VARIABLES LIKE 'server_id';
+
+SHOW BINARY LOGS;
+
+SELECT USER,HOST FROM mysql.user
+
+SHOW VARIABLES LIKE '%server%';
+
+SELECT * FROM bigchannel WHERE NAME ='内部测试服02'
+UPDATE bigchannel SET descri='内部测试服02' WHERE NAME ='内部测试服02'
+
+SHOW VARIABLES LIKE "log_bin";
+
+SET GLOBAL server_id =10002
+
+SHOW GLOBAL VARIABLES LIKE 'log_bin' ;
+
+SHOW VARIABLES LIKE 'binlog_format';
+SHOW VARIABLES LIKE 'binlog_row_image';
+```
+

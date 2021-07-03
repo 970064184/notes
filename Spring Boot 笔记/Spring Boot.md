@@ -809,7 +809,7 @@ java -jar spring-boot-02-config-02-0.0.1-SNAPSHOT.jar --server.port=8087  --serv
     profiles:
       active: @spring.profiles.active@
       include: common
-   ```
+  ```
 
 - 
 
@@ -2230,6 +2230,8 @@ public class MyLocaleResolver implements LocaleResolver {
 
 
 ```
+
+> 语言简称简体中文(中国)zh_CN繁体中文(中国台湾)zh_TW繁体中文(中国香港)zh_HK英语(中国香港)en_HK英语(美国)en_US英语(英国)en_GB英语(全球)en_WW英语(加拿大)en_CA英语(澳大利亚)en_AU英语(爱尔兰)en_IE英语(芬兰)en_FI芬兰语(芬兰)fi_FI英语(丹麦)en_DK丹麦语(丹麦)da_DK英语(以色列)en_IL希伯来语(以色列)he_IL英语(南非)en_ZA英语(印度)en_IN英语(挪威)en_NO英语(新加坡)en_SG英语(新西兰)en_NZ英语(印度尼西亚)en_ID英语(菲律宾)en_PH英语(泰国)en_TH英语(马来西亚)en_MY英语(阿拉伯)en_XA韩文(韩国)ko_KR日语(日本)ja_JP荷兰语(荷兰)nl_NL荷兰语(比利时)nl_BE葡萄牙语(葡萄牙)pt_PT葡萄牙语(巴西)pt_BR法语(法国)fr_FR法语(卢森堡)fr_LU法语(瑞士)fr_CH法语(比利时)fr_BE法语(加拿大)fr_CA西班牙语(拉丁美洲)es_LA西班牙语(西班牙)es_ES西班牙语(阿根廷)es_AR西班牙语(美国)es_US西班牙语(墨西哥)es_MX西班牙语(哥伦比亚)es_CO西班牙语(波多黎各)es_PR德语(德国)de_DE德语(奥地利)de_AT德语(瑞士)de_CH俄语(俄罗斯)ru_RU意大利语(意大利)it_IT希腊语(希腊)el_GR挪威语(挪威)no_NO匈牙利语(匈牙利)hu_HU土耳其语(土耳其)tr_TR捷克语(捷克共和国)cs_CZ斯洛文尼亚语sl_SL波兰语(波兰)pl_PL瑞典语(瑞典)sv_SE西班牙语(智利)es_CL
 
 ### 3）、登陆
 

@@ -249,6 +249,85 @@ https://blog.csdn.net/weixin_40834464/article/details/88850523
 
 - @EnableFeignClients("com.zhangbin.cloud.feign")要带上包路径，否则会报错
 
+## 动态替换URL
+
+```java
+package com.gzyouai.hummingbird.web.gmbackend.server.common.controller.common;
+
+import com.gzyouai.hummingbird.web.common.core.model.Result;
+import com.gzyouai.hummingbird.web.common.feign.ConfigFeignClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
+import java.util.Map;
+
+/**
+ * @author zb
+ * @date 2020/10/14 14:56
+ */
+@RestController
+public class ConfigController implements ConfigFeignClient {
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
+    @Override
+    public Result refreshFeign(String key,String replaceValue) throws IllegalAccessException {
+        //获取容器总的所有feign接口
+        Map<String, Object> beansWithAnnotation = applicationContext.getBeansWithAnnotation(FeignClient.class);
+
+        //遍历替换feign接口的所有符合条件的url对象的值
+        for(Map.Entry<String, Object> set:beansWithAnnotation.entrySet()){
+            Object value = set.getValue();
+            if(Proxy.isProxyClass(value.getClass())){
+                //拿到feign的动态代理对象
+                InvocationHandler invocationHandler = Proxy.getInvocationHandler(value);
+                //获取feign接口上面的信息，存在feignClient中
+                Type[] genericInterfaces = value.getClass().getGenericInterfaces();
+                FeignClient feignClient = ((Class<?>)genericInterfaces[0]).getAnnotation(FeignClient.class);
+
+                //通过动态代理对象的target可以拿到feign的url信息
+                Field target = ReflectionUtils.findField(invocationHandler.getClass(), "target");
+                target.setAccessible(true);
+                //获取HardCodedTarget对象，里面的url就是feign对象的动态代理对象中用来存储url、name信息的对象
+                Object o = target.get(invocationHandler);
+
+                //设置需要被替换的变量，例如下面就是将url中的${feign.auth}替换为http://zhangsan
+                ConfigurableEnvironment c = (ConfigurableEnvironment) applicationContext.getEnvironment();
+                c.getSystemProperties().put(key,replaceValue);
+
+                //对url的值进行替换
+                Field url = ReflectionUtils.findField(o.getClass(), "url");
+                url.setAccessible(true);
+                url.set(o,c.resolvePlaceholders(feignClient.url()));
+                System.out.println(invocationHandler);
+            }
+
+        }
+        return Result.succeed(beansWithAnnotation);
+    }
+}
+
+```
+
+
+
+## 超时
+
+```java
+hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds=60000
+ribbon.ReadTimeout=3000
+ribbon.ConnectTimeout=60000
+```
+
 
 
 # 引出zuul 

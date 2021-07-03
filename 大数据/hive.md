@@ -59,4 +59,71 @@ show role grant user admin;
 
 --取消角色关联
 --revoke daqin_admin from user daqin2;
+
+
+grant all On DATABASE xinji_tmp to user daqin 
+grant all On DATABASE xinji_test to user daqin 	
+show grant user daqin on all 	
+show grant user daqin on database xinji 
+show grant user daqin on database diguo 
+show grant user daqin on database daqin 
+show grant user daqin on database xunqinji 
+show grant user daqin on database daqin 
+show grant user daqin on database xinji 
+grant all On DATABASE xinji to user daqin 
+show grant role public on table biwu2.c_creative_group_info; 
+show grant role public on database biwu2; 
+show grant role public on database daqin; 
+show roles 
 ```
+
+# 分区
+
+```sql
+---查看分区
+show partitions diguo.a_role ;
+show partitions guozhan3.a_role partition(ds='2020-11-01');
+
+---增加分区
+---ALTER TABLE ${PROJECT}.${TABLE} ADD IF NOT EXISTS PARTITION (gameid = ${GAMEID}, ds = '${TOMORROW}');
+
+ALTER TABLE ${PROJECT}.${TABLE} ADD IF NOT EXISTS PARTITION (gameid = ${GAMEID}, ds = '${TOMORROW}');
+```
+
+```java
+set role admin
+desc daqin.f_dau;
+
+select * from f_dau;
+
+show partitions daqin.f_dau;
+
+show partitions daqin.f_dar_pay;
+
+show partitions daqin.a_user;
+
+show create table f_dau;
+
+show create table daqin.a_user;
+
+show create table daqin.f_dar;
+
+alter table daqin.f_dau partition column (gameid int, ds string);
+
+
+
+ALTER TABLE ${PROJECT}.${TABLE} ADD IF NOT EXISTS PARTITION (gameid = ${GAMEID}, ds = '${TOMORROW}');
+
+
+
+CREATE EXTERNAL TABLE f_dar
+(
+    dar int
+) PARTITIONED BY (gameid int, ds string)
+    STORED AS ORC
+    LOCATION 'oss://${OSSPATH}/f_dar/'
+    TBLPROPERTIES ("orc.compress" = "SNAPPY");
+
+
+```
+

@@ -177,6 +177,8 @@ redis与其他key-value缓存产品有以下三个特点：
 
 启动：redis-server ./redis.conf  	(redis-server /usr/local/redis/redis.conf)
 
+​	- 按照步骤：https://www.cnblogs.com/zdd-java/p/10288734.html
+
 进入命令行模式：redis-cli
 
 关闭redis：shutdown save --》exit
