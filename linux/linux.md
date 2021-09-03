@@ -11,8 +11,9 @@
 
 ![](images/QQ截图20181116130856.png)
 
-
 # linux目录结构
+
+> linux一切皆文件
 
 ![](images/QQ截图20181008174039.png)
 
@@ -1053,7 +1054,7 @@ expr 'expr 2 + 3' \
     #echo "$DATETIME"
     echo "======开始备份===="
     echo "======备份路径是：$BACKUP/$DATETIME.tar.gz"
-
+    
     #主机
     HOST=localhost
     #用户名
@@ -1072,7 +1073,7 @@ expr 'expr 2 + 3' \
     tar -zcvf $DATETIME.tar.gz $DATETIME
     #删除临时目录
     rm -rf $BACKUP/$DATETIME
-
+    
     #删除10天前的备份文件
     find $BACKUP -mtime +10 -name "*.tar.gz" -exec rm -rf {} \;
     echo "======备份文件成功======"
@@ -1168,3 +1169,86 @@ echo 3 > /proc/sys/vm/drop_caches
 
 
 ![](images/QQ截图20200927165459.png)
+
+## 常用命令
+
+> stat查看文件信息
+> man帮助
+> --help
+> ls -h 
+> cd -、. 、..、
+> more 空格翻页、b向上分页、回车向下滚动一行、
+> less 
+> head显示文件头
+> tail显示文件尾
+> cp -a保留原文件信息、-r递归复制
+> chmod u g o a u+x 、u-x、421 （777、755、644）
+> chown 修改所有者  修改所有者和所属组chown root:root test.txt
+> chgrp 修改所属组
+> whereis
+> which
+> whoami
+> useradd 、passwd、
+> locate根据文件名搜索
+> find -name、-iname、-size、-atime、-mtime、-ctime、-type
+> eg：find . -size +2k -a -type f
+> grep 在文件中查询符合条件的字符串 -i忽略大小写 、-n输出行号、-v取反、--color=auto、-A
+> 通配符： ?匹配任意一个字符、*匹配0个或任意内容、[]匹配括号中任意一个字符、[-]、[^]匹配不是括号内发一个字符
+> 正则：^匹配行首、$匹配行尾、？匹配一个字符重复0次或1次、*匹配前一个字符重复0次或任意多次、[]、[-]、[^]
+> | 管道：文本流；
+> netstat eg：netstat -an |grep 80 | wc -l
+> ctrl+A 行头
+> ctrl+E 行尾
+> ctrl+U 删除或剪切光标之前的命令
+> ctrl+Y 粘贴
+> ctrl+L = clear
+> ping -c 次数
+> netstat -tunlp | grep 8080
+> w
+> who
+> last 查看系统所有登陆过的用户信息
+> lastlog 
+> du -h --max-depth=1* 文件夹
+> du -sh 当前文件夹总大小
+> df -h 系统
+> mount挂载
+> unmount卸载
+
+> vim  a、A、i、I、o、O、gg、G、^、$、:n、x、nx、dd、ndd、p、yy、nyy、撤销：u、反撤销ctrl+u、:set nu、:set nonu、:syntax on、:syntax off、查找：/、?、n、N、替换：:1,10s/old/new/g替换1到10行的所有old为new、:%s/old/new/g替换整个文件的old为new、注释：:1,10s/^/#/g注释1到10行、:1.10s/^#//g取消注释
+
+>
+>
+>shell：
+>echo -e、-n
+>history  !n调用第几行的命令
+>重定向>覆盖、>>追加、2>>错误信息、命令 >>文件 2>&1 错误信息和正确信息放到一个文件里、命令 >>文件1 2>>文件2 错误信息和正确信息分开两个文件
+>&&与
+>||或 命令1 || 命令2：当命令1不正确，则命令2执行。当命令1正确，命令2就不会执行
+>`命令`   等同于 $(命令)
+>$变量名
+>数据类型：默认字符串，进行计算时要指定类型
+>declare 声明类型 -a数组、-i整数、-r只读、-、+、-x环境变量、-p显示类型，declare -i c=$a+$b
+>d=$(expr $a + $b)
+>let d=$a+$b
+>需计算时用$(( ))、$[]
+>数组打印：${变量名[*]}
+>需拼接时，变量需用双引号包含“$变量名”或${变量名}
+>env\set查询环境变量
+>位置参数变量：$0代表命令本身，$1-$9代表参数，10以上用${10}、$*所有参数、$@、$#参数个数
+>$?判断上条命令是否正确，0为正确，非0为不正确
+>read 接收键盘输入 -p 、 -t、-n、-s
+>[ 表达式 ]： 判断
+>exit 退出
+>判断y是否有值或空：x=${y-新值} 通过检测x的值判断y的值
+>source使环境变量生效：/etc/profile、/ect/profile.d/*.sh、~/.bash_profile、~/.bashrc、/etc/bashrc
+>基础正则：*  grep "aa*"至少包含一个a、. 匹配除了换行符外任意一个字符、^行首、$行尾、[]括号中指定的任意一个字符、[^]括号字符以外的任意一个字符、\转义符 grep "\.$" 以.号结尾、\{n\}前面的字符出现n次、\{n,\}前面的字符出现不小于n次、\{n,m\}前面的字符至少出现n次，最多出现m次
+>扩展正则：+前一个字符匹配一次或任意多次、？前一个字符匹配0或1次、| 、（）
+
+
+
+>
+>
+>字符：
+>cut列提取 -f列号、-d分隔符(不能用空格)、-c字符范围 eg：grep "/bin/bash" /etc/profile | grep -v "root" |cut -d ":"  -f 1
+>awk：可用空格提取列
+>printf ：awk的格式化输出 %m.nf输出浮点数(%8.2f：总共8位，2位小数，6位整数)、%ns、%ni、\n换行、\t tab
