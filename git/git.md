@@ -33,7 +33,6 @@
 > ~ 后面的数字表示回退几次提交，默认是一次
 >
 > 当然还可以换成git bash，powershell等就不会出现这种问题了
-> 
 
 **4. 不删除工作空间改动代码，撤销commit，并且撤销git add(常用)**
 
@@ -235,3 +234,8 @@ deelop分支
 
 负责人：开发人员
 
+# 多个ssh-key的配置
+
+https://blog.csdn.net/baijunzhijiang_01/article/details/51524759
+
+>  ssh-add ~/.ssh/id_rsa_gitLab

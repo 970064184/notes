@@ -1153,6 +1153,8 @@ WantedBy=default.target
   - kill -9
 - 改密码
 
+https://helpcdn.aliyun.com/knowledge_detail/41206.html
+
 ## linux下内存buff/cache占用过多问题解决
 
 ![](images/QQ截图20200927165401.png)
@@ -1169,6 +1171,10 @@ echo 3 > /proc/sys/vm/drop_caches
 
 
 ![](images/QQ截图20200927165459.png)
+
+
+
+
 
 ## 常用命令
 
@@ -1213,8 +1219,11 @@ echo 3 > /proc/sys/vm/drop_caches
 > df -h 系统
 > mount挂载
 > unmount卸载
-
-> vim  a、A、i、I、o、O、gg、G、^、$、:n、x、nx、dd、ndd、p、yy、nyy、撤销：u、反撤销ctrl+u、:set nu、:set nonu、:syntax on、:syntax off、查找：/、?、n、N、替换：:1,10s/old/new/g替换1到10行的所有old为new、:%s/old/new/g替换整个文件的old为new、注释：:1,10s/^/#/g注释1到10行、:1.10s/^#//g取消注释
+> ntpdate 不同机器的时间同步
+>
+> echo -e、-n
+> history  !n调用第几行的命令
+> 重定向>覆盖、>>追加、2>>错误信息、命令 >>文件 2>&1 错误信息和正确信息放到一个文件里、命令 >>文件1 2>>文件2 错误信息和正确信息分开两个文件
 
 >
 >
@@ -1226,7 +1235,7 @@ echo 3 > /proc/sys/vm/drop_caches
 >||或 命令1 || 命令2：当命令1不正确，则命令2执行。当命令1正确，命令2就不会执行
 >`命令`   等同于 $(命令)
 >$变量名
->数据类型：默认字符串，进行计算时要指定类型
+>数据类型：默认字符串，计算时要指定类型
 >declare 声明类型 -a数组、-i整数、-r只读、-、+、-x环境变量、-p显示类型，declare -i c=$a+$b
 >d=$(expr $a + $b)
 >let d=$a+$b
@@ -1237,18 +1246,41 @@ echo 3 > /proc/sys/vm/drop_caches
 >位置参数变量：$0代表命令本身，$1-$9代表参数，10以上用${10}、$*所有参数、$@、$#参数个数
 >$?判断上条命令是否正确，0为正确，非0为不正确
 >read 接收键盘输入 -p 、 -t、-n、-s
->[ 表达式 ]： 判断
+>[ 表达式 ]： 判断，权限、文件修改时间、是否是文件。。。-eq相等、-ne不相等、-gt大于、lt小于、-ge大于等于、-le小于等于、-z字符串是否为空、-n字符串是否为非空、==、!=、[ -z "$name" -a "$a" -gt 23]、-a逻辑与、-o逻辑或、！
+>if [ 条件判断式 ]；then
+>	程序 
+>fi
+>case $变量名  in
+>"值1") 程序 ::
+>esac
+>for 变量 in 值1 值2 值3···
+>do
+>程序
+>done
+>for (( ; ; ))
+>while [ 条件判断式 ]
+>do
+>程序
+>done
+>until 循环，与while相反
 >exit 退出
->判断y是否有值或空：x=${y-新值} 通过检测x的值判断y的值
+>break
+>continue
+>判断y是否有值或空：x=${y-新值} 通过x的值判断y的值
 >source使环境变量生效：/etc/profile、/ect/profile.d/*.sh、~/.bash_profile、~/.bashrc、/etc/bashrc
->基础正则：*  grep "aa*"至少包含一个a、. 匹配除了换行符外任意一个字符、^行首、$行尾、[]括号中指定的任意一个字符、[^]括号字符以外的任意一个字符、\转义符 grep "\.$" 以.号结尾、\{n\}前面的字符出现n次、\{n,\}前面的字符出现不小于n次、\{n,m\}前面的字符至少出现n次，最多出现m次
->扩展正则：+前一个字符匹配一次或任意多次、？前一个字符匹配0或1次、| 、（）
+>基础：*  grep "aa*"至少包含一个a、. 匹配除了换行符外任意一个字符、^行首、$行尾、[]括号中指定的任意一个字符、[^]括号字符以外任意一个字符、\转义符 grep "\.$" 以.号结尾、\{n\}前面的字符出现n次、\{n,\}前面的字符出现不小于n次、\{n,m\}前面的字符至少出现n次，最多出现m次
+>扩展：+前一个字符匹配一次或任意多次、？前一个字符匹配0或1次、| 、（）
 
 
 
->
->
 >字符：
 >cut列提取 -f列号、-d分隔符(不能用空格)、-c字符范围 eg：grep "/bin/bash" /etc/profile | grep -v "root" |cut -d ":"  -f 1
->awk：可用空格提取列
->printf ：awk的格式化输出 %m.nf输出浮点数(%8.2f：总共8位，2位小数，6位整数)、%ns、%ni、\n换行、\t tab
+>awk：可用空格提取列、BEGIN、END、>=、<=、。。。、正则、
+>printf ：awk的格式化输出 %m.nf输出浮点数(%8.2f：总共8位，2位小数，6位整数)、%ns、%ni、\n换行、\t Tab
+>df -h | awk '{printf $4 $6}'
+>sed修改字符串 sed 选项 '动作' 文件名 -e编辑、 a追加、c行替换、i插入、p打印、s字符替换 sed '2p' test.txt
+>sort排序 -f忽略大小写、。。。
+>uniq 删除重复行=sort -u
+>wc统计命令 -l只统计行数、-w只统计单词数、-m只统计字符数
+
+> vim  a、A、i、I、o、O、gg、G、^、$、:n、x、nx、dd、ndd、p、yy、nyy、撤销：u、反撤销ctrl+u、:set nu、:set nonu、:syntax on、:syntax off、查找：/、?、n、N、替换：:1,10s/old/new/g替换1到10行的所有old为new、:%s/old/new/g替换整个文件的old为new、注释：:1,10s/^/#/g注释1到10行、:1.10s/^#//g取消注释
